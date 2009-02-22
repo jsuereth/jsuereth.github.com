@@ -11,6 +11,7 @@ The basic just is that we are going to create a "constructor" method for the wid
 For our example, I'll be using the @Ext.data.DataProxy@ class as what we're extending.
 
 So... first, let's define our constructor in a location:
+
 {% highlight js %}
 //Ensures there are at least dummy objects leading into Ext.ux.data
 Ext.namespace('Ext.ux.data');
@@ -38,10 +39,9 @@ Ext.ux.data.MyProxy = function(config){
 Ext.extend(Ext.ux.data.MyProxy, Ext.data.DataProxy);
 {% endhighlight %}
 
-Now we can make use of DataProxy methods from within MyProxy using "this.methodName(args)".   This isn't very exciting yet because DataProxy is mostly an empty class (besides configuring the Observable class for us).
+Now we can make use of DataProxy methods from within MyProxy using @this.methodName(args)@.   This isn't very exciting yet because DataProxy is mostly an empty class (besides configuring the Observable class for us).
 
 The convention for adding methods into a subclass is to use the override parameter from Ext.extend.   This parameter is essentially an anonymous class containing methods to inject "over-top" of the parent class.  In the case where the method did not exist before, it is merely inserted.  Let's implement the load method (required for DataProxy subclasses) using this approach:
-
 
 {% highlight js %}
 //Ensures there are at least dummy objects leading into Ext.ux.data

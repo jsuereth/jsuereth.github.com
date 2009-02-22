@@ -34,10 +34,10 @@
          <li><a href="/protocopter">Protocopter</a></li>
          <li class="last"><a href="contact.html">Contact</a></li>
     </ul>
-    <h2>Recent Posts</h2>
-    <ul>
-      {% for post in site.posts limit:5 %}
-        <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
+    <h2>All Posts</h2>
+    <ul class="post-list">
+      {% for post in site.posts %}
+        <li><span class="date">{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
       {% endfor %}      
     </ul>
   </div>
@@ -52,6 +52,17 @@
       </p>
   </div>  
 </div>
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try{
+var pageTracker = _gat._getTracker("UA-5651872-1");
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
 
 </body>
 </html>
