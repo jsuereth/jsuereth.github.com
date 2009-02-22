@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Leveraging Annotations in Scala
+category: scala
 ---
 
 This post began as a discussion on #scala about how people define a public "getter" method and private "setter" method using only defs and vars in scala.  The usual method in scala is:
@@ -236,10 +237,12 @@ As you can see, we're combining our "AnnotatedSetterShouldBePrivate" extractor w
 Next we should choose what phase to run this plugin after.  I've chosen the "typer" phase, as this ensures we at least have an AST and the types are correct.  When defining a class in isolation, this is working perfectly.  However when defining the class and using it with other classes, I'm running into the difficulty where the methods I'm modifying are eventually being replaced with public methods of a differing names.  To look into this, we should set up some integration tests.  NOW we can use the SHITTY plugin!
 
 The maven shitty plugin allows you to execute "integration" projects that depend on the currently "building" project.   You simple create a directory in src/it, add a pom.xml that depends on your project (with a version of "testing"), and a goal.txt that describes which maven goals should be executed.   If the integration project's maven build succeeds, the overall project's maven build continues.  If an integration project's maven build fails, the entire build fails.  This works great for "positive" tests (or test where you make sure that things compile with your plugin).   Let's define a relatively simple positive test.   First, we take the class outlined earlier as our example syntax:
+
 {% highlight scala %}
 package org.scala_lang.privateSetter
 
 class privateSetter extends StaticAnnotation {
+
 }
 {% endhighlight %}
 
@@ -318,6 +321,7 @@ Next we create a pom file for this integration test:
 
 </project>
 {% endhighlight %}
+
 You'll notice we're making us of the "testing" version of our plugin AND the "compilerPlugin" configuration option of the maven-scala-plugin.   This option is new to the (not yet released except as a SNAPSHOT) 2.10 version, and allows you to depend on any number of scalac plugins during your build.  We're using it now to depend on our build.  Our goals.txt simply consists of "clean compile".  
 
 Another thing that the SHITTY plugin lets you do is provide a 'validate.groovy' file with your pom.xml and goals.txt.   This file is run after a build to ensure things were successful.   We can use this to ensure our generated classfiles have private setters.  We'll tackle that problem another day (I'm currently being lame and running javap on the .class files).

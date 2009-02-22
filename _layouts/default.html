@@ -27,12 +27,18 @@
   </div>
   <hr/>
   <div class="span-4">
-    <h2 class="accessibility">Navigation</h2>
+    <h2>Navigation</h2>
     <ul>
          <li><strong><a href="/">Home</a></strong></li>
          <li><a href="http://github.com/davidB/maven-scala-plugin/tree/master">Maven Scala Plugin</a></li>
          <li><a href="/protocopter">Protocopter</a></li>
          <li class="last"><a href="contact.html">Contact</a></li>
+    </ul>
+    <h2>Recent Posts</h2>
+    <ul>
+      {% for post in site.posts limit:5 %}
+        <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
+      {% endfor %}      
     </ul>
   </div>
   <div id="content" class="span-20 last">  

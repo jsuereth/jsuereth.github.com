@@ -1,17 +1,18 @@
 ---
-layout: default
+layout: post
 title: Josh Suereth
 ---
 
 
 <div id="main">
-  <h1>Blog Posts</h1>
-  <ul class="posts">
-    {% for post in site.posts %}
-      <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
-    {% endfor %}
-  </ul>
+  <h1>Welcome</h1>
+  <p>I'm currently toying around with various formats for this blog.  Please feel free to read my latest article:   
+  {% for post in site.posts limit:1 %}
+  <a href="{{ post.url }}">{{ post.title }}</a>
+  {% endfor %}
+  </p>
   
+     
   <!--  TODO Widgets! -->
 </div>
   
