@@ -21,7 +21,7 @@ function twitterCallback2(data) {
                      atuser.substring(1)+
                      "</a>"
                   });
-         tweets.push("<li><span>"+
+         tweets.push('<li><span class="user">'+user+'</span> - <br/><span class="tweet">'+
                tweetHTML+
                '</span> <a style="font-size:85%" href="http://twitter.com/'+
                user+
