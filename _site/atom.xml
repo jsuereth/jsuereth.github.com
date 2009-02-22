@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+ 
+ <title>Rants, Raves and Ridicule</title>
+ <link href="http://jsuereth.github.com/atom.xml" rel="self"/>
+ <link href="http://jsuereth.github.com/"/>
+ <updated>2009-02-21T20:47:45-05:00</updated>
+ <id>http://jsuereth.github.com/</id>
+ <author>
+   <name>Josh Suereth</name>
+   <email>Joshua dot Suereth at gmail.com</email>
+ </author>
+
+ 
+ <entry>
+   <title>New Blog Site</title>
+   <link href="http://jsuereth.github.com//2009/02/20/new-blog-site.html"/>
+   <updated>2009-02-20T00:00:00-05:00</updated>
+   <id>http://jsuereth.github.com//2009/02/20/new-blog-site</id>
+   <content type="html">&lt;h1&gt;New Blog Site&lt;/h1&gt;
+&lt;p&gt;Hey, just thought I&amp;#8217;d make an initial post to announce my switch to a statically generated blog site.  Hopefully I can keep the content kicking &lt;span class="caps"&gt;AND&lt;/span&gt; still have neato features like &lt;span class="caps"&gt;RSS&lt;/span&gt; feeds, etc.&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s some terminal syntax highlighting:&lt;/p&gt;
+&lt;pre class="terminal"&gt;&lt;code&gt;$ jekyll /path/to/raw/site /path/to/place/generated/site&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Ruby Highlighting&lt;br /&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;foo&lt;/span&gt;
+  &lt;span class="nb"&gt;puts&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;foo&amp;#39;&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;How bout some Java?&lt;br /&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Simple&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+	&lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="nf"&gt;kthx&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;bye!&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;How bout some Scala?&lt;br /&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;object&lt;/span&gt; &lt;span class="nc"&gt;HAI&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+	&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="n"&gt;kthx&lt;/span&gt; &lt;span class="k"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;bye!&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>Leveraging Annotations in Scala</title>
+   <link href="http://jsuereth.github.com//2009/02/05/leveraging-annotations-in-scala.html"/>
+   <updated>2009-02-05T00:00:00-05:00</updated>
+   <id>http://jsuereth.github.com//2009/02/05/leveraging-annotations-in-scala</id>
+   <content type="html">&lt;p&gt;This post began as a discussion on #scala about how people define a public &amp;#8220;getter&amp;#8221; method and private &amp;#8220;setter&amp;#8221; method using only defs and vars in scala.  The usual method in scala is:&lt;br /&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;MyClass&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+   &lt;span class="k"&gt;private&lt;/span&gt; &lt;span class="k"&gt;var&lt;/span&gt; &lt;span class="n"&gt;x_private&lt;/span&gt; &lt;span class="k"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;Int&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;_&lt;/span&gt;
+   &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="k"&gt;=&lt;/span&gt; &lt;span class="n"&gt;x_private&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;The downside to this is that you have two names to express one concept.  I&amp;#8217;m at the point where I&amp;#8217;m no longer caring too much about public/private parts of classes, but I thought I&amp;#8217;d tackle the problem to exercise my new-found compiler skills.  It turns out this feat is pretty easy to accomplish via a scalac plugin.&lt;/p&gt;
+&lt;p&gt;To create your first plugin you should follow the guide here:http://www.scala-lang.org/node/140.  We&amp;#8217;ll be using the Maven as our build tool, since to do otherwise would be blasphemy (for me).&lt;/p&gt;
+&lt;p&gt;To start off with, here&amp;#8217;s the &lt;span class="caps"&gt;POM&lt;/span&gt; file for our plugin:&lt;br /&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;project&lt;/span&gt; &lt;span class="na"&gt;xmlns=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://maven.apache.org/POM/4.0.0&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;xmlns:xsi=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot;&lt;/span&gt;
+ &lt;span class="na"&gt;xsi:schemaLocation=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+ &lt;span class="nt"&gt;&amp;lt;modelVersion&amp;gt;&lt;/span&gt;4.0.0&lt;span class="nt"&gt;&amp;lt;/modelVersion&amp;gt;&lt;/span&gt;
+ &lt;span class="nt"&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.scala-lang&lt;span class="nt"&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+ &lt;span class="nt"&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;private-setter-scalac-plugin&lt;span class="nt"&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+ &lt;span class="nt"&gt;&amp;lt;packaging&amp;gt;&lt;/span&gt;jar&lt;span class="nt"&gt;&amp;lt;/packaging&amp;gt;&lt;/span&gt;
+ &lt;span class="nt"&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.0-SNAPSHOT&lt;span class="nt"&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+ &lt;span class="nt"&gt;&amp;lt;name&amp;gt;&lt;/span&gt;Var definition extensions for the scala compiler&lt;span class="nt"&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+ &lt;span class="nt"&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://suereth.blogspot.com&lt;span class="nt"&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;
+ &lt;span class="nt"&gt;&amp;lt;repositories&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;repository&amp;gt;&lt;/span&gt;
+   &lt;span class="nt"&gt;&amp;lt;id&amp;gt;&lt;/span&gt;scala-tools.org&lt;span class="nt"&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;
+   &lt;span class="nt"&gt;&amp;lt;name&amp;gt;&lt;/span&gt;Scala-tools Maven2 Repository&lt;span class="nt"&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+   &lt;span class="nt"&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://scala-tools.org/repo-releases&lt;span class="nt"&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;/repository&amp;gt;&lt;/span&gt;
+ &lt;span class="nt"&gt;&amp;lt;/repositories&amp;gt;&lt;/span&gt;
+ &lt;span class="nt"&gt;&amp;lt;pluginRepositories&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;pluginRepository&amp;gt;&lt;/span&gt;
+   &lt;span class="nt"&gt;&amp;lt;id&amp;gt;&lt;/span&gt;scala-tools.org&lt;span class="nt"&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;
+   &lt;span class="nt"&gt;&amp;lt;name&amp;gt;&lt;/span&gt;Scala-tools Maven2 Repository&lt;span class="nt"&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+   &lt;span class="nt"&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://scala-tools.org/repo-releases&lt;span class="nt"&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;/pluginRepository&amp;gt;&lt;/span&gt;
+ &lt;span class="nt"&gt;&amp;lt;/pluginRepositories&amp;gt;&lt;/span&gt;
+ &lt;span class="nt"&gt;&amp;lt;dependencies&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+   &lt;span class="nt"&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.scala-lang&lt;span class="nt"&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+   &lt;span class="nt"&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;scala-compiler&lt;span class="nt"&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+   &lt;span class="nt"&gt;&amp;lt;version&amp;gt;&lt;/span&gt;2.7.3&lt;span class="nt"&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+ &lt;span class="nt"&gt;&amp;lt;/dependencies&amp;gt;&lt;/span&gt;
+ &lt;span class="nt"&gt;&amp;lt;build&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;plugins&amp;gt;&lt;/span&gt;
+   &lt;span class="nt"&gt;&amp;lt;plugin&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.scala-tools&lt;span class="nt"&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;maven-scala-plugin&lt;span class="nt"&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;executions&amp;gt;&lt;/span&gt;
+     &lt;span class="nt"&gt;&amp;lt;execution&amp;gt;&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;lt;goals&amp;gt;&lt;/span&gt;
+       &lt;span class="nt"&gt;&amp;lt;goal&amp;gt;&lt;/span&gt;add-source&lt;span class="nt"&gt;&amp;lt;/goal&amp;gt;&lt;/span&gt;
+       &lt;span class="nt"&gt;&amp;lt;goal&amp;gt;&lt;/span&gt;compile&lt;span class="nt"&gt;&amp;lt;/goal&amp;gt;&lt;/span&gt;
+       &lt;span class="nt"&gt;&amp;lt;goal&amp;gt;&lt;/span&gt;testCompile&lt;span class="nt"&gt;&amp;lt;/goal&amp;gt;&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;lt;/goals&amp;gt;&lt;/span&gt;
+     &lt;span class="nt"&gt;&amp;lt;/execution&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;/executions&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;configuration&amp;gt;&lt;/span&gt;
+     &lt;span class="nt"&gt;&amp;lt;jvmArgs&amp;gt;&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;lt;jvmArg&amp;gt;&lt;/span&gt;-Xms64m&lt;span class="nt"&gt;&amp;lt;/jvmArg&amp;gt;&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;lt;jvmArg&amp;gt;&lt;/span&gt;-Xmx1024m&lt;span class="nt"&gt;&amp;lt;/jvmArg&amp;gt;&lt;/span&gt;
+     &lt;span class="nt"&gt;&amp;lt;/jvmArgs&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;/configuration&amp;gt;&lt;/span&gt;
+   &lt;span class="nt"&gt;&amp;lt;/plugin&amp;gt;&lt;/span&gt;
+   &lt;span class="nt"&gt;&amp;lt;plugin&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.codehaus.mojo&lt;span class="nt"&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;shitty-maven-plugin&lt;span class="nt"&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;executions&amp;gt;&lt;/span&gt;
+     &lt;span class="nt"&gt;&amp;lt;execution&amp;gt;&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;lt;goals&amp;gt;&lt;/span&gt;
+       &lt;span class="nt"&gt;&amp;lt;goal&amp;gt;&lt;/span&gt;clean&lt;span class="nt"&gt;&amp;lt;/goal&amp;gt;&lt;/span&gt;
+       &lt;span class="nt"&gt;&amp;lt;goal&amp;gt;&lt;/span&gt;install&lt;span class="nt"&gt;&amp;lt;/goal&amp;gt;&lt;/span&gt;
+       &lt;span class="nt"&gt;&amp;lt;goal&amp;gt;&lt;/span&gt;test&lt;span class="nt"&gt;&amp;lt;/goal&amp;gt;&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;lt;/goals&amp;gt;&lt;/span&gt;
+     &lt;span class="nt"&gt;&amp;lt;/execution&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;/executions&amp;gt;&lt;/span&gt;
+   &lt;span class="nt"&gt;&amp;lt;/plugin&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;/plugins&amp;gt;&lt;/span&gt;
+ &lt;span class="nt"&gt;&amp;lt;/build&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/project&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s a few things in this pom, mostly to ensure that the scala-tools repositories are available too us.  Also, ignore the shitty (Super-Helpful-Integration-Testing-ThingY) plugin for now.  The most important part is that we&amp;#8217;re compiling to a jar file, and we&amp;#8217;re depending on the scala-compiler.   The version of the compiler we depend on is the &lt;strong&gt;only&lt;/strong&gt; version of scala your plugin should be used with.  In all reality, the scala-compiler should probably be deifned as a &amp;#8216;provided&amp;#8217; dependency and the scala-library should explicitly be depended on, but for now we&amp;#8217;ll cheat on completeness.&lt;/p&gt;
+&lt;p&gt;Next we need to make sure there is a &lt;code&gt;scalac-plugin.xml&lt;/code&gt; file in the created &lt;span class="caps"&gt;JAR&lt;/span&gt;. This is simple in maven, just place one in the &lt;code&gt;src/main/resources&lt;/code&gt; directory.   Here is what my &lt;code&gt;src/main/resources/scalac-plugin.xml&lt;/code&gt; looks like:&lt;/p&gt;
+&lt;p&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;plugin&amp;gt;&lt;/span&gt;&lt;br /&gt;
+  &lt;span class="nt"&gt;&amp;lt;name&amp;gt;&lt;/span&gt;private-setters&lt;span class="nt"&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;&lt;br /&gt;
+  &lt;span class="nt"&gt;&amp;lt;classname&amp;gt;&lt;/span&gt;org.scala_lang.privateSetter.internal.privateSetterPlugin&lt;span class="nt"&gt;&amp;lt;/classname&amp;gt;&lt;/span&gt;&lt;br /&gt;
+&lt;span class="nt"&gt;&amp;lt;/plugin&amp;gt;&lt;/span&gt;&lt;br /&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;br /&gt;
+You&amp;#8217;ll notice I&amp;#8217;m naming my plugin &amp;#8220;private-setters&amp;#8221; and placing it in a &amp;#8220;internal&amp;#8221; package.   This could be my eclipse plugin development rubbing off, but this helps me know what only the compiler should see.&lt;/p&gt;
+&lt;p&gt;Next we need a way for clients of our plugin to &amp;#8220;notify&amp;#8221; us that they want a var with a private setter method (&lt;code&gt;varname_=&lt;/code&gt;), but public getter (&lt;code&gt;varname&lt;/code&gt;).   Here&amp;#8217;s my initial cut at client syntax:&lt;/p&gt;
+&lt;p&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;org.scala_lang.privateSetter._&lt;/span&gt;&lt;br /&gt;
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;TestWidget&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;br /&gt;
+  &lt;span class="nd"&gt;@privateSetter&lt;/span&gt;&lt;br /&gt;
+  &lt;span class="k"&gt;var&lt;/span&gt; &lt;span class="n"&gt;myVar&lt;/span&gt; &lt;span class="k"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;  &lt;br /&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;&lt;br /&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;br /&gt;
+Pretty simple really, but effective.  (Also I already know how to look up annotations from my scala-mojo-support project, so it only took me a few hours to work out the scalac plugin details.   This post actually took the most amount of time in the whole venture).&lt;/p&gt;
+&lt;p&gt;Now we need to define the &lt;code&gt;privateSetter&lt;/code&gt; annotation we can use in our classes.  It&amp;#8217;s a fairly simple file:&lt;/p&gt;
+&lt;p&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;package&lt;/span&gt; &lt;span class="nn"&gt;org.scala_lang.privateSetter&lt;/span&gt;&lt;br /&gt;
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;privateSetter&lt;/span&gt; &lt;span class="k"&gt;extends&lt;/span&gt; &lt;span class="nc"&gt;StaticAnnotation&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;br /&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;&lt;br /&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;br /&gt;
+Next we need to write the plugin itself.  All plugins contain some boiler-plate code, so we&amp;#8217;ll ignore that for the time being. (&lt;em&gt;see the &lt;a href="http://www.scala-lang.org/node/140"&gt;documentation mentioned above&lt;/a&gt; _&lt;/em&gt;).  The truly interesting part of this plugin is the newly defined phase.&lt;/p&gt;
+&lt;p&gt;For some history, the Scala Compiler (scalac) is composed of various &amp;#8220;phases&amp;#8221;.  Each phase has a responsibility it performs.  Some phases are easy to identifier e.g. &amp;#8220;icode&amp;#8221; which converts the &lt;span class="caps"&gt;AST&lt;/span&gt; to icode for each &amp;#8220;compilation unit&amp;#8221;.  In the Scala Compiler a compilation unit corresponds to a source code file and may produce multiple class files.  Here&amp;#8217;s the &lt;code&gt;scalac -Xlist-phases&lt;/code&gt; output on my machine:&lt;/p&gt;
+&lt;p&gt;&lt;/notextile&gt;&lt;/p&gt;
+&lt;p&gt;On to our implementation!  The basic structure of our phase looks like this:&lt;/p&gt;
+&lt;p&gt;&lt;div class="highlight"&gt;&lt;pre&gt;    &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;MakeSettersPrivatePhase&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;prev&lt;/span&gt;&lt;span class="k"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;Phase&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="k"&gt;extends&lt;/span&gt; &lt;span class="nc"&gt;Phase&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;prev&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;br /&gt;
+      &lt;br /&gt;
+      &lt;span class="k"&gt;override&lt;/span&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt; &lt;span class="k"&gt;=&lt;/span&gt; &lt;span class="nc"&gt;VarAccessChanger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;br /&gt;
+      &lt;span class="k"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;global._&lt;/span&gt;&lt;br /&gt;
+      &lt;span class="k"&gt;override&lt;/span&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="n"&gt;run&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;br /&gt;
+ &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;unit&lt;/span&gt; &lt;span class="k"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;global&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;currentRun&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;units&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;unit&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;isJava&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;br /&gt;
+           &lt;span class="n"&gt;unit&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;body&lt;/span&gt; &lt;span class="k"&gt;=&lt;/span&gt; &lt;span class="nc"&gt;TreeTransformer&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;transform&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;unit&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;body&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;      &lt;br /&gt;
+ &lt;span class="o"&gt;}&lt;/span&gt;&lt;br /&gt;
+      &lt;span class="o"&gt;}&lt;/span&gt;&lt;br /&gt;
+      &lt;span class="o"&gt;&amp;#8230;&lt;/span&gt;&lt;br /&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;&lt;br /&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;br /&gt;
+I&amp;#8217;ll mention that this class is nested inside an outer &amp;#8220;Plugin&amp;#8221; class which is passed the &amp;#8216;global&amp;#8217; object.  For those of you unfamiliar with the compiler, the &amp;#8220;Global&amp;#8221; object is the outer layer of the &amp;#8220;cake&amp;#8221; pattern used by the Scala Compiler.  I&amp;#8217;m reserving judgment on Global, but I have noticed that it&amp;#8217;s very hard to unit test any &amp;#8220;module&amp;#8221; you write for Global (as most of them have the &lt;code&gt;self:Global =&amp;gt;&lt;/code&gt; syntax).&lt;/p&gt;
+&lt;p&gt;The Transformer is a very nice class for doing &lt;span class="caps"&gt;AST&lt;/span&gt; manipulation (thanks &lt;span class="caps"&gt;DRM&lt;/span&gt; for suggesting it).   This class simply transforms the &lt;span class="caps"&gt;AST&lt;/span&gt; from one form to another.  It&amp;#8217;s perhaps the easiest way to implement our plugin.  Let&amp;#8217;s set up a Tree Transformation that does absolutely nothing useful:&lt;/p&gt;
+&lt;p&gt;&lt;div class="highlight"&gt;&lt;pre&gt;      &lt;span class="k"&gt;object&lt;/span&gt; &lt;span class="nc"&gt;TreeTransformer&lt;/span&gt; &lt;span class="k"&gt;extends&lt;/span&gt; &lt;span class="nc"&gt;Transformer&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+        &lt;span class="k"&gt;override&lt;/span&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="n"&gt;transform&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tree&lt;/span&gt;&lt;span class="k"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;Tree&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="k"&gt;=&lt;/span&gt; &lt;span class="n"&gt;tree&lt;/span&gt; &lt;span class="k"&gt;match&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;br /&gt;
+         &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="n"&gt;t&lt;/span&gt; &lt;span class="k"&gt;=&amp;gt;&lt;/span&gt;         &lt;br /&gt;
+           &lt;span class="k"&gt;super&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;transform&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;br /&gt;
+        &lt;span class="o"&gt;}&lt;/span&gt;&lt;br /&gt;
+      &lt;span class="o"&gt;}&lt;/span&gt;&lt;br /&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;br /&gt;
+&lt;br /&gt;
+The structure here is we override the transform method.  This method takes a tree and returns a tree.  We want to transform &lt;strong&gt;only&lt;/strong&gt; the setter part of a var method if it contains the privateSetter annotation.   Let&amp;#8217;s apply our pattern matching skills to the test with an extractor:  The &amp;#8220;AnnotationSetterShouldBePrivate&amp;#8221; extractor.&lt;/p&gt;
+&lt;p&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;object&lt;/span&gt; &lt;span class="nc"&gt;AnnotatedSetterShouldBePrivate&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="n"&gt;unapply&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;node&lt;/span&gt; &lt;span class="k"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;Tree&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="k"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;Option&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="kt"&gt;DefDef&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="n"&gt;hasPrivateSetterAnnotation&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;annotations&lt;/span&gt; &lt;span class="k"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;List&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="kt"&gt;Annotation&lt;/span&gt;&lt;span class="o"&gt;])&lt;/span&gt; &lt;span class="k"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;Boolean&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;br /&gt;
+      &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;br /&gt;
+           &lt;span class="n"&gt;annotation&lt;/span&gt; &lt;span class="k"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;annotations&lt;/span&gt;&lt;br /&gt;
+           &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;annotation&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;tpe&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;safeToString&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;classOf&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="kt"&gt;privateSetter&lt;/span&gt;&lt;span class="o"&gt;].&lt;/span&gt;&lt;span class="n"&gt;getName&lt;/span&gt;&lt;br /&gt;
+      &lt;span class="o"&gt;}&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;br /&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;&lt;br /&gt;
+      &lt;span class="o"&gt;}&lt;/span&gt;&lt;br /&gt;
+      &lt;span class="kc"&gt;false&lt;/span&gt;&lt;br /&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;&lt;br /&gt;
+    &lt;br /&gt;
+    &lt;span class="n"&gt;node&lt;/span&gt; &lt;span class="k"&gt;match&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;br /&gt;
+      &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="k"&gt;@&lt;/span&gt; &lt;span class="nc"&gt;DefDef&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mods&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="k"&gt;&lt;em&gt;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="k"&gt;&lt;/em&gt;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="k"&gt;&lt;em&gt;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="k"&gt;&lt;/em&gt;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;toString&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;endsWith&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;em&gt;$eq&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="k"&gt;=&amp;gt;&lt;/span&gt;&lt;br /&gt;
+         &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;hasPrivateSetterAnnotation&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mods&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;annotations&lt;/span&gt;&lt;span class="o"&gt;)){&lt;/span&gt;&lt;br /&gt;
+            &lt;span class="nc"&gt;Some&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;br /&gt;
+         &lt;span class="o"&gt;}&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;br /&gt;
+            &lt;span class="nc"&gt;None&lt;/span&gt;&lt;br /&gt;
+         &lt;span class="o"&gt;}&lt;/span&gt;&lt;br /&gt;
+      &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="k"&gt;&lt;/em&gt;&lt;/span&gt; &lt;span class="k"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="nc"&gt;None&lt;/span&gt;&lt;br /&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;&lt;br /&gt;
+  &lt;span class="o"&gt;}&lt;/span&gt;&lt;br /&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;&lt;br /&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;br /&gt;
+First, note that our extractor (unapply method) takes in a tree and returns a DefDef.  DefDef is the &lt;span class="caps"&gt;AST&lt;/span&gt; class for a &amp;#8220;def&amp;#8221; node.   All var&amp;#8217;s are parsed into dual &amp;#8220;def&amp;#8221; methods (setter and getter).  We define a helper method that takes a list of annotations and looks for our &amp;#8220;privateSetter&amp;#8221; annotation.   The actually implementation of the extractor matches against the tree node, checks to see if it&amp;#8217;s a DefDef and has a tailing name of &amp;#8220;_$eq&amp;#8221;.   &amp;#8220;_$eq&amp;#8221; is the mangled form of &amp;#8220;_=&amp;#8221; which is the convention for scala setter methods.  Note that I probably could move the if/else statement into the pattern match on the DefDef, but wasn&amp;#8217;t feeling adventurous enough this evening.  In the case where we find a valid annotated setter DefDef method, we return it, otherwise return None.&lt;/p&gt;
+&lt;p&gt;Now that we have our extractor, writing the tree transformation becomes fairly simple:&lt;/p&gt;
+&lt;p&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;object&lt;/span&gt; &lt;span class="nc"&gt;TreeTransformer&lt;/span&gt; &lt;span class="k"&gt;extends&lt;/span&gt; &lt;span class="nc"&gt;Transformer&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;br /&gt;
+    &lt;br /&gt;
+  &lt;span class="k"&gt;override&lt;/span&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="n"&gt;transform&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tree&lt;/span&gt;&lt;span class="k"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;Tree&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="k"&gt;=&lt;/span&gt; &lt;span class="n"&gt;tree&lt;/span&gt; &lt;span class="k"&gt;match&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;br /&gt;
+      &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nc"&gt;AnnotatedSetterShouldBePrivate&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;d&lt;/span&gt; &lt;span class="k"&gt;@&lt;/span&gt; &lt;span class="nc"&gt;DefDef&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mods&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;tparams&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;vparams&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;tpt&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;impl&lt;/span&gt;&lt;span class="o"&gt;))&lt;/span&gt; &lt;span class="k"&gt;=&amp;gt;&lt;/span&gt; &lt;br /&gt;
+          &lt;span class="k"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;symtab.Flags._&lt;/span&gt;&lt;br /&gt;
+          &lt;span class="k"&gt;val&lt;/span&gt; &lt;span class="n"&gt;tree&lt;/span&gt; &lt;span class="k"&gt;=&lt;/span&gt; &lt;span class="n"&gt;copy&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;DefDef&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;d&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;mods&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="nc"&gt;&lt;span class="caps"&gt;PRIVATE&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;tparams&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;vparams&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;tpt&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;transform&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;impl&lt;/span&gt;&lt;span class="o"&gt;))&lt;/span&gt;&lt;br /&gt;
+          &lt;span class="n"&gt;tree&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;symbol&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setFlag&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nc"&gt;&lt;span class="caps"&gt;PRIVATE&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;              &lt;br /&gt;
+          &lt;span class="n"&gt;tree&lt;/span&gt;&lt;br /&gt;
+      &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="n"&gt;t&lt;/span&gt; &lt;span class="k"&gt;=&amp;gt;&lt;/span&gt;&lt;br /&gt;
+          &lt;span class="k"&gt;super&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;transform&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;br /&gt;
+  &lt;span class="o"&gt;}&lt;/span&gt;&lt;br /&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;&lt;br /&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;br /&gt;
+As you can see, we&amp;#8217;re combining our &amp;#8220;AnnotatedSetterShouldBePrivate&amp;#8221; extractor with the natural extractor for the DefDef case class so that we can pull out all the constructor variables (along with the DefDef itself using the &amp;#8220;d @&amp;#8221; syntax).  Initially I tried returning just a newly constructed DefDef with &amp;#8220;mods | &lt;span class="caps"&gt;PRIVATE&lt;/span&gt;&amp;#8221; instead of &amp;#8220;mods&amp;#8221; in the constructor.  You&amp;#8217;ll find this blows up horribly.   The main issue is that the &lt;span class="caps"&gt;AST&lt;/span&gt; nodes contain &lt;strong&gt;more&lt;/strong&gt; than just their constructor values (types and symbols being the two things I found).   The Transformer class provides a &amp;#8220;copy&amp;#8221; value/object that you can use to &amp;#8220;copy&amp;#8221; various parts of the tree.   The copy class contains a method for every tree node that takes an original tree and overriding constructor values.  For our purposes, we&amp;#8217;re applying the &lt;span class="caps"&gt;PRIVATE&lt;/span&gt; flag to the &amp;#8220;mods&amp;#8221; attribute of the DefDef and two the symbol flags for the DefDef.  The symbol flags are what are eventually used in the icode&amp;#8594;bytecode conversion code.&lt;/p&gt;
+&lt;p&gt;Next we should choose what phase to run this plugin after.  I&amp;#8217;ve chosen the &amp;#8220;typer&amp;#8221; phase, as this ensures we at least have an &lt;span class="caps"&gt;AST&lt;/span&gt; and the types are correct.  When defining a class in isolation, this is working perfectly.  However when defining the class and using it with other classes, I&amp;#8217;m running into the difficulty where the methods I&amp;#8217;m modifying are eventually being replaced with public methods of a differing names.  To look into this, we should set up some integration tests.  &lt;span class="caps"&gt;NOW&lt;/span&gt; we can use the &lt;span class="caps"&gt;SHITTY&lt;/span&gt; plugin!&lt;/p&gt;
+&lt;p&gt;The maven shitty plugin allows you to execute &amp;#8220;integration&amp;#8221; projects that depend on the currently &amp;#8220;building&amp;#8221; project.   You simple create a directory in src/it, add a pom.xml that depends on your project (with a version of &amp;#8220;testing&amp;#8221;), and a goal.txt that describes which maven goals should be executed.   If the integration project&amp;#8217;s maven build succeeds, the overall project&amp;#8217;s maven build continues.  If an integration project&amp;#8217;s maven build fails, the entire build fails.  This works great for &amp;#8220;positive&amp;#8221; tests (or test where you make sure that things compile with your plugin).   Let&amp;#8217;s define a relatively simple positive test.   First, we take the class outlined earlier as our example syntax:&lt;br /&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;package&lt;/span&gt; &lt;span class="nn"&gt;org.scala_lang.privateSetter&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;package&lt;/span&gt; &lt;span class="nn"&gt;org.scala_lang.privateSetter&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;privateSetter&lt;/span&gt; &lt;span class="k"&gt;extends&lt;/span&gt; &lt;span class="nc"&gt;StaticAnnotation&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;&lt;br /&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;&lt;br /&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;/notextile&gt;&lt;/p&gt;
+&lt;p&gt;Next we create a pom file for this integration test:&lt;/p&gt;
+&lt;p&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;project&lt;/span&gt; &lt;span class="na"&gt;xmlns=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://maven.apache.org/&lt;span class="caps"&gt;POM&lt;/span&gt;/4.0.0&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;xmlns:xsi=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot;&lt;/span&gt;&lt;br /&gt;
+ &lt;span class="na"&gt;xsi:schemaLocation=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://maven.apache.org/&lt;span class="caps"&gt;POM&lt;/span&gt;/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;&lt;br /&gt;
+ &lt;span class="nt"&gt;&amp;lt;modelVersion&amp;gt;&lt;/span&gt;4.0.0&lt;span class="nt"&gt;&amp;lt;/modelVersion&amp;gt;&lt;/span&gt;&lt;br /&gt;
+ &lt;span class="nt"&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.scala-tools&lt;span class="nt"&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;&lt;br /&gt;
+ &lt;span class="nt"&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;testPrivateSetter&lt;span class="nt"&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;&lt;br /&gt;
+ &lt;span class="nt"&gt;&amp;lt;packaging&amp;gt;&lt;/span&gt;jar&lt;span class="nt"&gt;&amp;lt;/packaging&amp;gt;&lt;/span&gt;&lt;br /&gt;
+ &lt;span class="nt"&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.0-&lt;span class="caps"&gt;SNAPSHOT&lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;&lt;br /&gt;
+ &lt;span class="nt"&gt;&amp;lt;name&amp;gt;&lt;/span&gt;test-privateSetter-scalac-plugin&lt;span class="nt"&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;&lt;br /&gt;
+ &lt;span class="nt"&gt;&amp;lt;dependencies&amp;gt;&lt;/span&gt;&lt;br /&gt;
+  &lt;span class="nt"&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nt"&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.scala-lang&lt;span class="nt"&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nt"&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;private-setter-scalac-plugin&lt;span class="nt"&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nt"&gt;&amp;lt;version&amp;gt;&lt;/span&gt;testing&lt;span class="nt"&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;&lt;br /&gt;
+  &lt;span class="nt"&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;&lt;br /&gt;
+  &lt;span class="nt"&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nt"&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;junit&lt;span class="nt"&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nt"&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;junit&lt;span class="nt"&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nt"&gt;&amp;lt;version&amp;gt;&lt;/span&gt;4.5&lt;span class="nt"&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nt"&gt;&amp;lt;scope&amp;gt;&lt;/span&gt;test&lt;span class="nt"&gt;&amp;lt;/scope&amp;gt;&lt;/span&gt;&lt;br /&gt;
+  &lt;span class="nt"&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;&lt;br /&gt;
+ &lt;span class="nt"&gt;&amp;lt;/dependencies&amp;gt;&lt;/span&gt;&lt;br /&gt;
+ &lt;span class="nt"&gt;&amp;lt;build&amp;gt;&lt;/span&gt;&lt;br /&gt;
+  &lt;span class="nt"&gt;&amp;lt;plugins&amp;gt;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nt"&gt;&amp;lt;plugin&amp;gt;&lt;/span&gt;&lt;br /&gt;
+    &lt;span class="nt"&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.scala-tools&lt;span class="nt"&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;&lt;br /&gt;
+    &lt;span class="nt"&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;maven-scala-plugin&lt;span class="nt"&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;&lt;br /&gt;
+    &lt;span class="nt"&gt;&amp;lt;executions&amp;gt;&lt;/span&gt;&lt;br /&gt;
+     &lt;span class="nt"&gt;&amp;lt;execution&amp;gt;&lt;/span&gt;&lt;br /&gt;
+      &lt;span class="nt"&gt;&amp;lt;goals&amp;gt;&lt;/span&gt;&lt;br /&gt;
+       &lt;span class="nt"&gt;&amp;lt;goal&amp;gt;&lt;/span&gt;add-source&lt;span class="nt"&gt;&amp;lt;/goal&amp;gt;&lt;/span&gt;&lt;br /&gt;
+       &lt;span class="nt"&gt;&amp;lt;goal&amp;gt;&lt;/span&gt;compile&lt;span class="nt"&gt;&amp;lt;/goal&amp;gt;&lt;/span&gt;&lt;br /&gt;
+      &lt;span class="nt"&gt;&amp;lt;/goals&amp;gt;&lt;/span&gt;&lt;br /&gt;
+     &lt;span class="nt"&gt;&amp;lt;/execution&amp;gt;&lt;/span&gt;&lt;br /&gt;
+    &lt;span class="nt"&gt;&amp;lt;/executions&amp;gt;&lt;/span&gt;&lt;br /&gt;
+    &lt;span class="nt"&gt;&amp;lt;configuration&amp;gt;&lt;/span&gt;&lt;br /&gt;
+     &lt;span class="nt"&gt;&amp;lt;compilerPlugins&amp;gt;&lt;/span&gt;&lt;br /&gt;
+      &lt;span class="nt"&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;&lt;br /&gt;
+       &lt;span class="nt"&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.scala-lang&lt;span class="nt"&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;&lt;br /&gt;
+       &lt;span class="nt"&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;private-setter-scalac-plugin&lt;span class="nt"&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;&lt;br /&gt;
+       &lt;span class="nt"&gt;&amp;lt;version&amp;gt;&lt;/span&gt;testing&lt;span class="nt"&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;&lt;br /&gt;
+      &lt;span class="nt"&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;&lt;br /&gt;
+     &lt;span class="nt"&gt;&amp;lt;/compilerPlugins&amp;gt;&lt;/span&gt;&lt;br /&gt;
+     &lt;span class="nt"&gt;&amp;lt;args&amp;gt;&lt;/span&gt;&lt;br /&gt;
+      &lt;span class="nt"&gt;&amp;lt;arg&amp;gt;&lt;/span&gt;-verbose&lt;span class="nt"&gt;&amp;lt;/arg&amp;gt;&lt;/span&gt;&lt;br /&gt;
+     &lt;span class="nt"&gt;&amp;lt;/args&amp;gt;&lt;/span&gt;&lt;br /&gt;
+    &lt;span class="nt"&gt;&amp;lt;/configuration&amp;gt;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nt"&gt;&amp;lt;/plugin&amp;gt;&lt;/span&gt;&lt;br /&gt;
+  &lt;span class="nt"&gt;&amp;lt;/plugins&amp;gt;&lt;/span&gt;&lt;br /&gt;
+ &lt;span class="nt"&gt;&amp;lt;/build&amp;gt;&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+ &lt;span class="nt"&gt;&amp;lt;repositories&amp;gt;&lt;/span&gt;&lt;br /&gt;
+  &lt;span class="nt"&gt;&amp;lt;repository&amp;gt;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nt"&gt;&amp;lt;id&amp;gt;&lt;/span&gt;scala-tools.org&lt;span class="nt"&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nt"&gt;&amp;lt;name&amp;gt;&lt;/span&gt;Scala-tools Maven2 Repository&lt;span class="nt"&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nt"&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://scala-tools.org/repo-releases&lt;span class="nt"&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;&lt;br /&gt;
+  &lt;span class="nt"&gt;&amp;lt;/repository&amp;gt;&lt;/span&gt;&lt;br /&gt;
+ &lt;span class="nt"&gt;&amp;lt;/repositories&amp;gt;&lt;/span&gt;&lt;br /&gt;
+ &lt;span class="nt"&gt;&amp;lt;pluginRepositories&amp;gt;&lt;/span&gt;&lt;br /&gt;
+  &lt;span class="nt"&gt;&amp;lt;pluginRepository&amp;gt;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nt"&gt;&amp;lt;id&amp;gt;&lt;/span&gt;scala-tools.org&lt;span class="nt"&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nt"&gt;&amp;lt;name&amp;gt;&lt;/span&gt;Scala-tools Maven2 Repository&lt;span class="nt"&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nt"&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://scala-tools.org/repo-releases&lt;span class="nt"&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;&lt;br /&gt;
+  &lt;span class="nt"&gt;&amp;lt;/pluginRepository&amp;gt;&lt;/span&gt; &lt;br /&gt;
+  &lt;span class="nt"&gt;&amp;lt;pluginRepository&amp;gt;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nt"&gt;&amp;lt;id&amp;gt;&lt;/span&gt;snapshots.scala-tools.org&lt;span class="nt"&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nt"&gt;&amp;lt;name&amp;gt;&lt;/span&gt;Scala-tools Maven2 Snapshot Repository&lt;span class="nt"&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nt"&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://scala-tools.org/repo-snapshots&lt;span class="nt"&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;&lt;br /&gt;
+  &lt;span class="nt"&gt;&amp;lt;/pluginRepository&amp;gt;&lt;/span&gt;&lt;br /&gt;
+ &lt;span class="nt"&gt;&amp;lt;/pluginRepositories&amp;gt;&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+&lt;span class="nt"&gt;&amp;lt;/project&amp;gt;&lt;/span&gt;&lt;br /&gt;
+&lt;/pre&gt;&lt;/div&gt;You&amp;#8217;ll notice we&amp;#8217;re making us of the &amp;#8220;testing&amp;#8221; version of our plugin &lt;span class="caps"&gt;AND&lt;/span&gt; the &amp;#8220;compilerPlugin&amp;#8221; configuration option of the maven-scala-plugin.   This option is new to the (not yet released except as a &lt;span class="caps"&gt;SNAPSHOT&lt;/span&gt;) 2.10 version, and allows you to depend on any number of scalac plugins during your build.  We&amp;#8217;re using it now to depend on our build.  Our goals.txt simply consists of &amp;#8220;clean compile&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;Another thing that the &lt;span class="caps"&gt;SHITTY&lt;/span&gt; plugin lets you do is provide a &amp;#8216;validate.groovy&amp;#8217; file with your pom.xml and goals.txt.   This file is run after a build to ensure things were successful.   We can use this to ensure our generated classfiles have private setters.  We&amp;#8217;ll tackle that problem another day (I&amp;#8217;m currently being lame and running javap on the .class files).&lt;/p&gt;
+&lt;p&gt;I think I&amp;#8217;ve typed as much as I can for one night, I&amp;#8217;ll try to cover the remaining pieces (after I code/finish them) later.  Once again, there are some issues with the plugin as I&amp;#8217;m confusing the hell out of some of the compiler phases (not to mention being confused myself as to where things happen in some cases).  If you&amp;#8217;d like to look at the source (and perhaps contribute? ), it&amp;#8217;s available on github: &lt;a href="http://github.com/jsuereth/private-setter-scalac-plugin/tree/master"&gt;private-setter-scalac-plugin&lt;/a&gt;&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>Subclassing in ExtJS</title>
+   <link href="http://jsuereth.github.com//2008/12/08/subclassing-in-extjs.html"/>
+   <updated>2008-12-08T00:00:00-05:00</updated>
+   <id>http://jsuereth.github.com//2008/12/08/subclassing-in-extjs</id>
+   <content type="html">&lt;p&gt;It&amp;#8217;s been a while since I posted about ExtJS, so I thought I&amp;#8217;d take a crack at another post here.  This is going to cover the &lt;code&gt;Ext.extend&lt;/code&gt; method, and how you go about sub-classing an Ext component.&lt;/p&gt;
+&lt;p&gt;The basic just is that we are going to create a &amp;#8220;constructor&amp;#8221; method for the widget and bind it to a location (e.g. &lt;code&gt;Ext.ux.data.MyDataStore&lt;/code&gt;).  Then we&amp;#8217;re going to use &lt;code&gt;Ext.extend&lt;/code&gt; to plug in the methods of the parent objects, and override some at the same time.&lt;/p&gt;
+&lt;p&gt;For our example, I&amp;#8217;ll be using the &lt;code&gt;Ext.data.DataProxy&lt;/code&gt; class as what we&amp;#8217;re extending.&lt;/p&gt;
+&lt;p&gt;So&amp;#8230; first, let&amp;#8217;s define our constructor in a location:&lt;br /&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;//Ensures there are at least dummy objects leading into Ext.ux.data&lt;/span&gt;
+&lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;namespace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Ext.ux.data&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;//Ensures there are at least dummy objects leading into Ext.ux.data&lt;/span&gt;&lt;br /&gt;
+&lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;namespace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Ext.ux.data&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ux&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;MyProxy&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;config&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;&lt;/p&gt;
+&lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ux&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;MyProxy&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;superclass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;constructor&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;p&gt;&lt;span class="p"&gt;};&lt;/span&gt;&lt;br /&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;/notextile&gt;&lt;/p&gt;
+&lt;p&gt;The code doesn&amp;#8217;t do a whole lot, but we have our constructor.  However when executing &lt;code&gt;new Ext.ux.data.MyProxy()&lt;/code&gt; we get an error, superclass is &lt;strong&gt;not&lt;/strong&gt; defined.  So&amp;#8230; where does superclass come from?  It will actually be injected into our prototype via the &lt;code&gt;Ext.extend&lt;/code&gt; method.   In fact, &lt;code&gt;Ext.extend&lt;/code&gt; will also inject the methods &amp;#8220;override&amp;#8221; and &amp;#8220;extend&amp;#8221; into our class.  Here&amp;#8217;s our new class with the &lt;code&gt;Ext.extend&lt;/code&gt; call:&lt;/p&gt;
+&lt;p&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;//Ensures there are at least dummy objects leading into Ext.ux.data&lt;/span&gt;&lt;br /&gt;
+&lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;namespace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Ext.ux.data&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+&lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ux&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;MyProxy&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;config&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+    &lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ux&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;MyProxy&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;superclass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;constructor&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+&lt;span class="p"&gt;};&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+&lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;extend&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ux&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;MyProxy&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;DataProxy&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;br /&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;br /&gt;
+Now we can make use of DataProxy methods from within MyProxy using &amp;#8220;this.methodName(args)&amp;#8221;.   This isn&amp;#8217;t very exciting yet because DataProxy is mostly an empty class (besides configuring the Observable class for us).&lt;/p&gt;
+&lt;p&gt;The convention for adding methods into a subclass is to use the override parameter from Ext.extend.   This parameter is essentially an anonymous class containing methods to inject &amp;#8220;over-top&amp;#8221; of the parent class.  In the case where the method did not exist before, it is merely inserted.  Let&amp;#8217;s implement the load method (required for DataProxy subclasses) using this approach:&lt;/p&gt;
+&lt;p&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;//Ensures there are at least dummy objects leading into Ext.ux.data&lt;/span&gt;&lt;br /&gt;
+&lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;namespace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Ext.ux.data&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+&lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ux&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;MyProxy&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;config&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;&lt;br /&gt;
+    &lt;span class="c"&gt;//Calls our super-class (Ext.data.DataProxy) constructor for full initialization&lt;/span&gt;&lt;br /&gt;
+    &lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ux&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;MyProxy&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;superclass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;constructor&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+&lt;span class="p"&gt;};&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+&lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;extend&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ux&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;MyProxy&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;DataProxy&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+   &lt;span class="c"&gt;//Load function as defined in HttpProxy, and needed for the &amp;quot;DataProxy interface&amp;#8230;&amp;quot;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nx"&gt;load&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;params&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;reader&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;callback&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;scope&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;callbackArg&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;br /&gt;
+         &lt;span class="nx"&gt;params&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;params&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt; &lt;span class="c"&gt;//Ensure params exists as an object&lt;/span&gt;&lt;br /&gt;
+         &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;result&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;&lt;br /&gt;
+         &lt;span class="k"&gt;try&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;br /&gt;
+            &lt;span class="c"&gt;//Use record reading to read &amp;quot;stock&amp;quot; data&lt;/span&gt;&lt;br /&gt;
+            &lt;span class="nx"&gt;result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;reader&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;readRecords&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt; &lt;span class="nx"&gt;zombieKid&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;i&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;like&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;turtles&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="p"&gt;});&lt;/span&gt;&lt;br /&gt;
+         &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;catch&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;e&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;br /&gt;
+           &lt;span class="c"&gt;//We had an issue pulling in stock data, fire appropriate events&lt;/span&gt;&lt;br /&gt;
+           &lt;span class="c"&gt;//use callback in fail mode and bail.  This function is actually coming from&lt;/span&gt;&lt;br /&gt;
+           &lt;span class="c"&gt;// the Observable class which is our &amp;quot;grandparent&amp;quot; class&lt;/span&gt;&lt;br /&gt;
+            &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;fireEvent&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;loadexception&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;callbackArg&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;null&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;e&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+            &lt;span class="nx"&gt;callback&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;scope&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;null&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;callbackArg&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;false&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;&lt;br /&gt;
+         &lt;span class="p"&gt;}&lt;/span&gt;&lt;br /&gt;
+         &lt;span class="c"&gt;//Inform the callback of the result of parsing our &amp;quot;stock&amp;quot; data&lt;/span&gt;&lt;br /&gt;
+         &lt;span class="nx"&gt;callback&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;scope&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;result&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;callbackArg&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;false&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;         &lt;br /&gt;
+   &lt;span class="p"&gt;}&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+&lt;span class="p"&gt;});&lt;/span&gt;&lt;br /&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;br /&gt;
+As you can see&amp;#8230; our load method is basically taking the reader (Record reader) passed in and attempting to read some stock data (calling appropriate callbacks as necessary).&lt;/p&gt;
+&lt;p&gt;Notice the use of the &amp;#8220;this.fireEvent&amp;#8221; inside our method.  Because of how JavaScript handles resolution, this will refer to our fully constructed class at the time of invocation ( as opposed to definition), therefore the fireEvent method from Observable will be accessable from our object.&lt;/p&gt;
+&lt;p&gt;The next important thing in defining your own widget is adding information to take in during construction.  Our superclass constructor does not take any arguments, hence the &amp;#8220;Ext.ux.data.MyProxy.superclass.constructor.call(this);&amp;#8221; in our constructor.  If perhaps our superclass constructor took a config object, we would have to change it.   Luckily our current widget constructor expects a config object, so we can just pass it through to our super (assuming the configs are complementary).&lt;/p&gt;
+&lt;p&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="p"&gt;&amp;#8230;&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+&lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ux&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;MyProxy&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;config&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;&lt;br /&gt;
+    &lt;span class="c"&gt;//Calls our super-class (Ext.data.DataProxy) constructor for full initialization&lt;/span&gt;&lt;br /&gt;
+    &lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ux&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;MyProxy&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;superclass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;constructor&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;config&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;br /&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+&lt;span class="p"&gt;&amp;#8230;&lt;/span&gt;&lt;br /&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;br /&gt;
+Since the DataProxy class doesn&amp;#8217;t take anything in its constructor, we&amp;#8217;ll remove this, but it&amp;#8217;s an important feature to make note of.  Also remember you can make subclasses which could add/change configuration information sent to parents.  That&amp;#8217;s the nice part about having control of the config obejct before passing it to the superclass constructor.&lt;/p&gt;
+&lt;p&gt;Now onto taking in our own information.  Let&amp;#8217;s mimic the &amp;#8220;MemoryProxy&amp;#8221; and take in some data during construction that we using during our &amp;#8220;load&amp;#8221; method.  We&amp;#8217;ll call this element &amp;#8216;data&amp;#8217; in the config and our object.&lt;/p&gt;
+&lt;p&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;//Ensures there are at least dummy objects leading into Ext.ux.data&lt;/span&gt;&lt;br /&gt;
+&lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;namespace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Ext.ux.data&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+&lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ux&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;MyProxy&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;config&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;   &lt;br /&gt;
+    &lt;span class="c"&gt;//Pull out our &amp;quot;data&amp;quot;&lt;/span&gt;&lt;br /&gt;
+    &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;config&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+    &lt;span class="c"&gt;//Calls our super-class (Ext.data.DataProxy) constructor for full initialization&lt;/span&gt;&lt;br /&gt;
+    &lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ux&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;MyProxy&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;superclass&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;constructor&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+&lt;span class="p"&gt;};&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+&lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;extend&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ux&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;MyProxy&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;Ext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;DataProxy&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+   &lt;span class="c"&gt;//Load function as defined in HttpProxy, and needed for the &amp;quot;DataProxy interface&amp;#8230;&amp;quot;&lt;/span&gt;&lt;br /&gt;
+   &lt;span class="nx"&gt;load&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;params&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;reader&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;callback&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;scope&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;callbackArg&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;br /&gt;
+         &lt;span class="nx"&gt;params&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;params&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt; &lt;span class="c"&gt;//Ensure params exists as an object&lt;/span&gt;&lt;br /&gt;
+         &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;result&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;&lt;br /&gt;
+         &lt;span class="k"&gt;try&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;br /&gt;
+            &lt;span class="c"&gt;//Use record reading to read &amp;quot;passed in&amp;quot; data&lt;/span&gt;&lt;br /&gt;
+            &lt;span class="nx"&gt;result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;reader&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;readRecords&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;data&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;br /&gt;
+         &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;catch&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;e&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;br /&gt;
+           &lt;span class="c"&gt;//We had an issue pulling in stock data, fire appropriate events&lt;/span&gt;&lt;br /&gt;
+           &lt;span class="c"&gt;//use callback in fail mode and bail.  This function is actually coming from&lt;/span&gt;&lt;br /&gt;
+           &lt;span class="c"&gt;// the Observable class which is our &amp;quot;grandparent&amp;quot; class&lt;/span&gt;&lt;br /&gt;
+            &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;fireEvent&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;loadexception&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;callbackArg&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;null&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;e&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+            &lt;span class="nx"&gt;callback&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;scope&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;null&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;callbackArg&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;false&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;&lt;br /&gt;
+         &lt;span class="p"&gt;}&lt;/span&gt;&lt;br /&gt;
+         &lt;span class="c"&gt;//Inform the callback of the result of parsing our &amp;quot;stock&amp;quot; data&lt;/span&gt;&lt;br /&gt;
+         &lt;span class="nx"&gt;callback&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;scope&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;result&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;callbackArg&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;false&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;         &lt;br /&gt;
+   &lt;span class="p"&gt;}&lt;/span&gt;&lt;br /&gt;
+&lt;br /&gt;
+&lt;span class="p"&gt;});&lt;/span&gt;&lt;br /&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;br /&gt;
+The above is an almost exact duplicate of MemoryProxy.js from the ExtJS source.  I thought about having a more clever tutorial about a custom widget, but I&amp;#8217;m trying to avoid assuming too much knowledge of ExtJS internals.  Anyway, I hope this makes you feel more comfortable creating your own classes and extending ExtJS widgets with custom functionality.   As always, let me know if you find any errors or typos.&lt;/p&gt;</content>
+ </entry>
+ 
+ 
+</feed>

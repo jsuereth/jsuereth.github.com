@@ -1,0 +1,35 @@
+---
+layout: post
+title: New Blog Site
+---
+
+h1. {{ page.title }}
+
+Hey, just thought I'd make an initial post to announce my switch to a statically generated blog site.  Hopefully I can keep the content kicking AND still have neato features like RSS feeds, etc.
+
+
+Here's some terminal syntax highlighting:
+
+<pre class="terminal"><code>$ jekyll /path/to/raw/site /path/to/place/generated/site</code></pre>
+
+
+Ruby Highlighting
+{% highlight ruby %}
+def foo
+  puts 'foo'
+end
+{% endhighlight %}
+
+How bout some Java?
+{% highlight java %}
+class Simple {
+	String kthx() { return "bye!"; }
+}
+{% endhighlight %}
+
+How bout some Scala?
+{% highlight scala %}
+object HAI {
+	def kthx = "bye!"
+}
+{% endhighlight %}

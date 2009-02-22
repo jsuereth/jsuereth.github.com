@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>Subclassing in ExtJS</title>
+   <meta name="author" content="Josh Suereth" />
+
+   <!-- Homepage CSS -->
+   <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection">
+   <link rel="stylesheet" href="/css/print.css" type="text/css" media="print">    
+   <!--[if IE]><link rel="stylesheet" href="/css/ie.css" type="text/css" media="screen, projection"><![endif]-->
+   
+   <!-- syntax highlighting CSS -->
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+
+</head>
+<body>
+
+<div class="container">
+  <div id="header" class="span-24 last">
+    <h1>Rants, Raves and Ridicule</h1>    
+  </div>
+  <hr/>
+  <div class="span-4">
+    <h2 class="accessibility">Navigation</h2>
+    <ul>
+         <li><strong><a href="/">Home</a></strong></li>
+         <li class="last"><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+  <div id="content" class="span-20 last">  
+    
+  <div id="entry" class="span-16 colborder">  
+    <p>It&#8217;s been a while since I posted about ExtJS, so I thought I&#8217;d take a crack at another post here.  This is going to cover the <code>Ext.extend</code> method, and how you go about sub-classing an Ext component.</p>
+<p>The basic just is that we are going to create a &#8220;constructor&#8221; method for the widget and bind it to a location (e.g. <code>Ext.ux.data.MyDataStore</code>).  Then we&#8217;re going to use <code>Ext.extend</code> to plug in the methods of the parent objects, and override some at the same time.</p>
+<p>For our example, I&#8217;ll be using the <code>Ext.data.DataProxy</code> class as what we&#8217;re extending.</p>
+<p>So&#8230; first, let&#8217;s define our constructor in a location:<br />
+<div class="highlight"><pre><span class="c">//Ensures there are at least dummy objects leading into Ext.ux.data</span>
+<span class="nx">Ext</span><span class="p">.</span><span class="nx">namespace</span><span class="p">(</span><span class="s1">&#39;Ext.ux.data&#39;</span><span class="p">);<div class="highlight"><pre><span class="c">//Ensures there are at least dummy objects leading into Ext.ux.data</span><br />
+<span class="nx">Ext</span><span class="p">.</span><span class="nx">namespace</span><span class="p">(</span><span class="s1">&#39;Ext.ux.data&#39;</span><span class="p">);</span></p>
+<p><span class="nx">Ext</span><span class="p">.</span><span class="nx">ux</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">MyProxy</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">config</span><span class="p">){</span></p>
+<span class="nx">Ext</span><span class="p">.</span><span class="nx">ux</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">MyProxy</span><span class="p">.</span><span class="nx">superclass</span><span class="p">.</span><span class="nx">constructor</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+<p><span class="p">};</span><br />
+</pre></div></notextile></p>
+<p>The code doesn&#8217;t do a whole lot, but we have our constructor.  However when executing <code>new Ext.ux.data.MyProxy()</code> we get an error, superclass is <strong>not</strong> defined.  So&#8230; where does superclass come from?  It will actually be injected into our prototype via the <code>Ext.extend</code> method.   In fact, <code>Ext.extend</code> will also inject the methods &#8220;override&#8221; and &#8220;extend&#8221; into our class.  Here&#8217;s our new class with the <code>Ext.extend</code> call:</p>
+<p><div class="highlight"><pre><span class="c">//Ensures there are at least dummy objects leading into Ext.ux.data</span><br />
+<span class="nx">Ext</span><span class="p">.</span><span class="nx">namespace</span><span class="p">(</span><span class="s1">&#39;Ext.ux.data&#39;</span><span class="p">);</span><br />
+<br />
+<span class="nx">Ext</span><span class="p">.</span><span class="nx">ux</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">MyProxy</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">config</span><span class="p">){</span><br />
+<br />
+    <span class="nx">Ext</span><span class="p">.</span><span class="nx">ux</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">MyProxy</span><span class="p">.</span><span class="nx">superclass</span><span class="p">.</span><span class="nx">constructor</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span><br />
+<br />
+<span class="p">};</span><br />
+<br />
+<span class="nx">Ext</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">Ext</span><span class="p">.</span><span class="nx">ux</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">MyProxy</span><span class="o">,</span> <span class="nx">Ext</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">DataProxy</span><span class="p">);</span><br />
+</pre></div><br />
+Now we can make use of DataProxy methods from within MyProxy using &#8220;this.methodName(args)&#8221;.   This isn&#8217;t very exciting yet because DataProxy is mostly an empty class (besides configuring the Observable class for us).</p>
+<p>The convention for adding methods into a subclass is to use the override parameter from Ext.extend.   This parameter is essentially an anonymous class containing methods to inject &#8220;over-top&#8221; of the parent class.  In the case where the method did not exist before, it is merely inserted.  Let&#8217;s implement the load method (required for DataProxy subclasses) using this approach:</p>
+<p><div class="highlight"><pre><span class="c">//Ensures there are at least dummy objects leading into Ext.ux.data</span><br />
+<span class="nx">Ext</span><span class="p">.</span><span class="nx">namespace</span><span class="p">(</span><span class="s1">&#39;Ext.ux.data&#39;</span><span class="p">);</span><br />
+<br />
+<span class="nx">Ext</span><span class="p">.</span><span class="nx">ux</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">MyProxy</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">config</span><span class="p">){</span><br />
+    <span class="c">//Calls our super-class (Ext.data.DataProxy) constructor for full initialization</span><br />
+    <span class="nx">Ext</span><span class="p">.</span><span class="nx">ux</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">MyProxy</span><span class="p">.</span><span class="nx">superclass</span><span class="p">.</span><span class="nx">constructor</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span><br />
+<br />
+<span class="p">};</span><br />
+<br />
+<span class="nx">Ext</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">Ext</span><span class="p">.</span><span class="nx">ux</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">MyProxy</span><span class="o">,</span> <span class="nx">Ext</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">DataProxy</span><span class="o">,</span> <span class="p">{</span><br />
+<br />
+   <span class="c">//Load function as defined in HttpProxy, and needed for the &quot;DataProxy interface&#8230;&quot;</span><br />
+   <span class="nx">load</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">params</span><span class="o">,</span> <span class="nx">reader</span><span class="o">,</span> <span class="nx">callback</span><span class="o">,</span> <span class="nx">scope</span><span class="o">,</span> <span class="nx">callbackArg</span><span class="p">)</span> <span class="p">{</span><br />
+         <span class="nx">params</span> <span class="o">=</span> <span class="nx">params</span> <span class="o">||</span> <span class="p">{};</span> <span class="c">//Ensure params exists as an object</span><br />
+         <span class="kd">var</span> <span class="nx">result</span><span class="o">;</span><br />
+         <span class="k">try</span> <span class="p">{</span><br />
+            <span class="c">//Use record reading to read &quot;stock&quot; data</span><br />
+            <span class="nx">result</span> <span class="o">=</span> <span class="nx">reader</span><span class="p">.</span><span class="nx">readRecords</span><span class="p">({</span> <span class="nx">zombieKid</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;i&#39;</span><span class="o">,</span> <span class="s1">&#39;like&#39;</span><span class="o">,</span> <span class="s1">&#39;turtles&#39;</span><span class="p">]</span> <span class="p">});</span><br />
+         <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span><br />
+           <span class="c">//We had an issue pulling in stock data, fire appropriate events</span><br />
+           <span class="c">//use callback in fail mode and bail.  This function is actually coming from</span><br />
+           <span class="c">// the Observable class which is our &quot;grandparent&quot; class</span><br />
+            <span class="k">this</span><span class="p">.</span><span class="nx">fireEvent</span><span class="p">(</span><span class="s2">&quot;loadexception&quot;</span><span class="o">,</span> <span class="k">this</span><span class="o">,</span> <span class="nx">callbackArg</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="nx">e</span><span class="p">);</span><br />
+<br />
+            <span class="nx">callback</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">scope</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="nx">callbackArg</span><span class="o">,</span> <span class="kc">false</span><span class="p">);</span><br />
+<br />
+            <span class="k">return</span><span class="o">;</span><br />
+         <span class="p">}</span><br />
+         <span class="c">//Inform the callback of the result of parsing our &quot;stock&quot; data</span><br />
+         <span class="nx">callback</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">scope</span><span class="o">,</span> <span class="nx">result</span><span class="o">,</span> <span class="nx">callbackArg</span><span class="o">,</span> <span class="kc">false</span><span class="p">);</span>         <br />
+   <span class="p">}</span><br />
+<br />
+<span class="p">});</span><br />
+</pre></div><br />
+As you can see&#8230; our load method is basically taking the reader (Record reader) passed in and attempting to read some stock data (calling appropriate callbacks as necessary).</p>
+<p>Notice the use of the &#8220;this.fireEvent&#8221; inside our method.  Because of how JavaScript handles resolution, this will refer to our fully constructed class at the time of invocation ( as opposed to definition), therefore the fireEvent method from Observable will be accessable from our object.</p>
+<p>The next important thing in defining your own widget is adding information to take in during construction.  Our superclass constructor does not take any arguments, hence the &#8220;Ext.ux.data.MyProxy.superclass.constructor.call(this);&#8221; in our constructor.  If perhaps our superclass constructor took a config object, we would have to change it.   Luckily our current widget constructor expects a config object, so we can just pass it through to our super (assuming the configs are complementary).</p>
+<p><div class="highlight"><pre><span class="p">&#8230;</span><br />
+<br />
+<span class="nx">Ext</span><span class="p">.</span><span class="nx">ux</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">MyProxy</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">config</span><span class="p">){</span><br />
+    <span class="c">//Calls our super-class (Ext.data.DataProxy) constructor for full initialization</span><br />
+    <span class="nx">Ext</span><span class="p">.</span><span class="nx">ux</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">MyProxy</span><span class="p">.</span><span class="nx">superclass</span><span class="p">.</span><span class="nx">constructor</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="o">,</span> <span class="nx">config</span><span class="p">);</span><br />
+<span class="p">}</span><br />
+<br />
+<span class="p">&#8230;</span><br />
+</pre></div><br />
+Since the DataProxy class doesn&#8217;t take anything in its constructor, we&#8217;ll remove this, but it&#8217;s an important feature to make note of.  Also remember you can make subclasses which could add/change configuration information sent to parents.  That&#8217;s the nice part about having control of the config obejct before passing it to the superclass constructor.</p>
+<p>Now onto taking in our own information.  Let&#8217;s mimic the &#8220;MemoryProxy&#8221; and take in some data during construction that we using during our &#8220;load&#8221; method.  We&#8217;ll call this element &#8216;data&#8217; in the config and our object.</p>
+<p><div class="highlight"><pre><span class="c">//Ensures there are at least dummy objects leading into Ext.ux.data</span><br />
+<span class="nx">Ext</span><span class="p">.</span><span class="nx">namespace</span><span class="p">(</span><span class="s1">&#39;Ext.ux.data&#39;</span><span class="p">);</span><br />
+<br />
+<span class="nx">Ext</span><span class="p">.</span><span class="nx">ux</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">MyProxy</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">config</span><span class="p">){</span>   <br />
+    <span class="c">//Pull out our &quot;data&quot;</span><br />
+    <span class="k">this</span><span class="p">.</span><span class="nx">data</span> <span class="o">=</span> <span class="nx">config</span><span class="p">.</span><span class="nx">data</span><br />
+<br />
+    <span class="c">//Calls our super-class (Ext.data.DataProxy) constructor for full initialization</span><br />
+    <span class="nx">Ext</span><span class="p">.</span><span class="nx">ux</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">MyProxy</span><span class="p">.</span><span class="nx">superclass</span><span class="p">.</span><span class="nx">constructor</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span><br />
+<br />
+<span class="p">};</span><br />
+<br />
+<span class="nx">Ext</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">Ext</span><span class="p">.</span><span class="nx">ux</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">MyProxy</span><span class="o">,</span> <span class="nx">Ext</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">DataProxy</span><span class="o">,</span> <span class="p">{</span><br />
+<br />
+   <span class="c">//Load function as defined in HttpProxy, and needed for the &quot;DataProxy interface&#8230;&quot;</span><br />
+   <span class="nx">load</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">params</span><span class="o">,</span> <span class="nx">reader</span><span class="o">,</span> <span class="nx">callback</span><span class="o">,</span> <span class="nx">scope</span><span class="o">,</span> <span class="nx">callbackArg</span><span class="p">)</span> <span class="p">{</span><br />
+         <span class="nx">params</span> <span class="o">=</span> <span class="nx">params</span> <span class="o">||</span> <span class="p">{};</span> <span class="c">//Ensure params exists as an object</span><br />
+         <span class="kd">var</span> <span class="nx">result</span><span class="o">;</span><br />
+         <span class="k">try</span> <span class="p">{</span><br />
+            <span class="c">//Use record reading to read &quot;passed in&quot; data</span><br />
+            <span class="nx">result</span> <span class="o">=</span> <span class="nx">reader</span><span class="p">.</span><span class="nx">readRecords</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span><br />
+         <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span><br />
+           <span class="c">//We had an issue pulling in stock data, fire appropriate events</span><br />
+           <span class="c">//use callback in fail mode and bail.  This function is actually coming from</span><br />
+           <span class="c">// the Observable class which is our &quot;grandparent&quot; class</span><br />
+            <span class="k">this</span><span class="p">.</span><span class="nx">fireEvent</span><span class="p">(</span><span class="s2">&quot;loadexception&quot;</span><span class="o">,</span> <span class="k">this</span><span class="o">,</span> <span class="nx">callbackArg</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="nx">e</span><span class="p">);</span><br />
+<br />
+            <span class="nx">callback</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">scope</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="nx">callbackArg</span><span class="o">,</span> <span class="kc">false</span><span class="p">);</span><br />
+<br />
+            <span class="k">return</span><span class="o">;</span><br />
+         <span class="p">}</span><br />
+         <span class="c">//Inform the callback of the result of parsing our &quot;stock&quot; data</span><br />
+         <span class="nx">callback</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">scope</span><span class="o">,</span> <span class="nx">result</span><span class="o">,</span> <span class="nx">callbackArg</span><span class="o">,</span> <span class="kc">false</span><span class="p">);</span>         <br />
+   <span class="p">}</span><br />
+<br />
+<span class="p">});</span><br />
+</pre></div><br />
+The above is an almost exact duplicate of MemoryProxy.js from the ExtJS source.  I thought about having a more clever tutorial about a custom widget, but I&#8217;m trying to avoid assuming too much knowledge of ExtJS internals.  Anyway, I hope this makes you feel more comfortable creating your own classes and extending ExtJS widgets with custom functionality.   As always, let me know if you find any errors or typos.</p>
+  </div>
+  <div id="widgetbar" class="span-4 last">
+      <div id="related">
+        <h2>Related Posts</h2>
+        <div class="box">
+          <ul class="posts">
+            
+              <li><span>20 Feb 2009</span> &raquo; <a href="/2009/02/20/new-blog-site.html">New Blog Site</a></li>
+            
+              <li><span>05 Feb 2009</span> &raquo; <a href="/2009/02/05/leveraging-annotations-in-scala.html">Leveraging Annotations in Scala</a></li>
+            
+          </ul>
+        </div>
+      </div>
+  </div>   
+
+  </div>
+  <div id="footer" class="span-24 last">
+      <p>
+        Josh Suereth<br />
+        Software Engineer
+      </p>
+  </div>  
+</div>
+
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <title>Leveraging Annotations in Scala</title>
+   <meta name="author" content="Josh Suereth" />
+
+   <!-- Homepage CSS -->
+   <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection">
+   <link rel="stylesheet" href="/css/print.css" type="text/css" media="print">    
+   <!--[if IE]><link rel="stylesheet" href="/css/ie.css" type="text/css" media="screen, projection"><![endif]-->
+   
+   <!-- syntax highlighting CSS -->
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+
+</head>
+<body>
+
+<div class="container">
+  <div id="header" class="span-24 last">
+    <h1>Rants, Raves and Ridicule</h1>    
+  </div>
+  <hr/>
+  <div class="span-4">
+    <h2 class="accessibility">Navigation</h2>
+    <ul>
+         <li><strong><a href="/">Home</a></strong></li>
+         <li class="last"><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+  <div id="content" class="span-20 last">  
+    
+  <div id="entry" class="span-16 colborder">  
+    <p>This post began as a discussion on #scala about how people define a public &#8220;getter&#8221; method and private &#8220;setter&#8221; method using only defs and vars in scala.  The usual method in scala is:<br />
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">MyClass</span> <span class="o">{</span>
+   <span class="k">private</span> <span class="k">var</span> <span class="n">x_private</span> <span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="k">_</span>
+   <span class="k">def</span> <span class="n">x</span> <span class="k">=</span> <span class="n">x_private</span>
+<span class="o">}</span>
+</pre></div></p>
+<p>The downside to this is that you have two names to express one concept.  I&#8217;m at the point where I&#8217;m no longer caring too much about public/private parts of classes, but I thought I&#8217;d tackle the problem to exercise my new-found compiler skills.  It turns out this feat is pretty easy to accomplish via a scalac plugin.</p>
+<p>To create your first plugin you should follow the guide here:http://www.scala-lang.org/node/140.  We&#8217;ll be using the Maven as our build tool, since to do otherwise would be blasphemy (for me).</p>
+<p>To start off with, here&#8217;s the <span class="caps">POM</span> file for our plugin:<br />
+<div class="highlight"><pre><span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">&quot;http://maven.apache.org/POM/4.0.0&quot;</span> <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+ <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd&quot;</span><span class="nt">&gt;</span>
+ <span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
+ <span class="nt">&lt;groupId&gt;</span>org.scala-lang<span class="nt">&lt;/groupId&gt;</span>
+ <span class="nt">&lt;artifactId&gt;</span>private-setter-scalac-plugin<span class="nt">&lt;/artifactId&gt;</span>
+ <span class="nt">&lt;packaging&gt;</span>jar<span class="nt">&lt;/packaging&gt;</span>
+ <span class="nt">&lt;version&gt;</span>1.0-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+ <span class="nt">&lt;name&gt;</span>Var definition extensions for the scala compiler<span class="nt">&lt;/name&gt;</span>
+ <span class="nt">&lt;url&gt;</span>http://suereth.blogspot.com<span class="nt">&lt;/url&gt;</span>
+ <span class="nt">&lt;repositories&gt;</span>
+  <span class="nt">&lt;repository&gt;</span>
+   <span class="nt">&lt;id&gt;</span>scala-tools.org<span class="nt">&lt;/id&gt;</span>
+   <span class="nt">&lt;name&gt;</span>Scala-tools Maven2 Repository<span class="nt">&lt;/name&gt;</span>
+   <span class="nt">&lt;url&gt;</span>http://scala-tools.org/repo-releases<span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;/repository&gt;</span>
+ <span class="nt">&lt;/repositories&gt;</span>
+ <span class="nt">&lt;pluginRepositories&gt;</span>
+  <span class="nt">&lt;pluginRepository&gt;</span>
+   <span class="nt">&lt;id&gt;</span>scala-tools.org<span class="nt">&lt;/id&gt;</span>
+   <span class="nt">&lt;name&gt;</span>Scala-tools Maven2 Repository<span class="nt">&lt;/name&gt;</span>
+   <span class="nt">&lt;url&gt;</span>http://scala-tools.org/repo-releases<span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;/pluginRepository&gt;</span>
+ <span class="nt">&lt;/pluginRepositories&gt;</span>
+ <span class="nt">&lt;dependencies&gt;</span>
+  <span class="nt">&lt;dependency&gt;</span>
+   <span class="nt">&lt;groupId&gt;</span>org.scala-lang<span class="nt">&lt;/groupId&gt;</span>
+   <span class="nt">&lt;artifactId&gt;</span>scala-compiler<span class="nt">&lt;/artifactId&gt;</span>
+   <span class="nt">&lt;version&gt;</span>2.7.3<span class="nt">&lt;/version&gt;</span>
+  <span class="nt">&lt;/dependency&gt;</span>
+ <span class="nt">&lt;/dependencies&gt;</span>
+ <span class="nt">&lt;build&gt;</span>
+  <span class="nt">&lt;plugins&gt;</span>
+   <span class="nt">&lt;plugin&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.scala-tools<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>maven-scala-plugin<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;executions&gt;</span>
+     <span class="nt">&lt;execution&gt;</span>
+      <span class="nt">&lt;goals&gt;</span>
+       <span class="nt">&lt;goal&gt;</span>add-source<span class="nt">&lt;/goal&gt;</span>
+       <span class="nt">&lt;goal&gt;</span>compile<span class="nt">&lt;/goal&gt;</span>
+       <span class="nt">&lt;goal&gt;</span>testCompile<span class="nt">&lt;/goal&gt;</span>
+      <span class="nt">&lt;/goals&gt;</span>
+     <span class="nt">&lt;/execution&gt;</span>
+    <span class="nt">&lt;/executions&gt;</span>
+    <span class="nt">&lt;configuration&gt;</span>
+     <span class="nt">&lt;jvmArgs&gt;</span>
+      <span class="nt">&lt;jvmArg&gt;</span>-Xms64m<span class="nt">&lt;/jvmArg&gt;</span>
+      <span class="nt">&lt;jvmArg&gt;</span>-Xmx1024m<span class="nt">&lt;/jvmArg&gt;</span>
+     <span class="nt">&lt;/jvmArgs&gt;</span>
+    <span class="nt">&lt;/configuration&gt;</span>
+   <span class="nt">&lt;/plugin&gt;</span>
+   <span class="nt">&lt;plugin&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.codehaus.mojo<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>shitty-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;executions&gt;</span>
+     <span class="nt">&lt;execution&gt;</span>
+      <span class="nt">&lt;goals&gt;</span>
+       <span class="nt">&lt;goal&gt;</span>clean<span class="nt">&lt;/goal&gt;</span>
+       <span class="nt">&lt;goal&gt;</span>install<span class="nt">&lt;/goal&gt;</span>
+       <span class="nt">&lt;goal&gt;</span>test<span class="nt">&lt;/goal&gt;</span>
+      <span class="nt">&lt;/goals&gt;</span>
+     <span class="nt">&lt;/execution&gt;</span>
+    <span class="nt">&lt;/executions&gt;</span>
+   <span class="nt">&lt;/plugin&gt;</span>
+  <span class="nt">&lt;/plugins&gt;</span>
+ <span class="nt">&lt;/build&gt;</span>
+<span class="nt">&lt;/project&gt;</span>
+</pre></div></p>
+<p>There&#8217;s a few things in this pom, mostly to ensure that the scala-tools repositories are available too us.  Also, ignore the shitty (Super-Helpful-Integration-Testing-ThingY) plugin for now.  The most important part is that we&#8217;re compiling to a jar file, and we&#8217;re depending on the scala-compiler.   The version of the compiler we depend on is the <strong>only</strong> version of scala your plugin should be used with.  In all reality, the scala-compiler should probably be deifned as a &#8216;provided&#8217; dependency and the scala-library should explicitly be depended on, but for now we&#8217;ll cheat on completeness.</p>
+<p>Next we need to make sure there is a <code>scalac-plugin.xml</code> file in the created <span class="caps">JAR</span>. This is simple in maven, just place one in the <code>src/main/resources</code> directory.   Here is what my <code>src/main/resources/scalac-plugin.xml</code> looks like:</p>
+<p><div class="highlight"><pre><span class="nt">&lt;plugin&gt;</span><br />
+  <span class="nt">&lt;name&gt;</span>private-setters<span class="nt">&lt;/name&gt;</span><br />
+  <span class="nt">&lt;classname&gt;</span>org.scala_lang.privateSetter.internal.privateSetterPlugin<span class="nt">&lt;/classname&gt;</span><br />
+<span class="nt">&lt;/plugin&gt;</span><br />
+</pre></div><br />
+You&#8217;ll notice I&#8217;m naming my plugin &#8220;private-setters&#8221; and placing it in a &#8220;internal&#8221; package.   This could be my eclipse plugin development rubbing off, but this helps me know what only the compiler should see.</p>
+<p>Next we need a way for clients of our plugin to &#8220;notify&#8221; us that they want a var with a private setter method (<code>varname_=</code>), but public getter (<code>varname</code>).   Here&#8217;s my initial cut at client syntax:</p>
+<p><div class="highlight"><pre><span class="k">import</span> <span class="nn">org.scala_lang.privateSetter._</span><br />
+<span class="k">class</span> <span class="nc">TestWidget</span> <span class="o">{</span><br />
+  <span class="nd">@privateSetter</span><br />
+  <span class="k">var</span> <span class="n">myVar</span> <span class="k">=</span> <span class="mi">5</span>  <br />
+<span class="o">}</span><br />
+</pre></div><br />
+Pretty simple really, but effective.  (Also I already know how to look up annotations from my scala-mojo-support project, so it only took me a few hours to work out the scalac plugin details.   This post actually took the most amount of time in the whole venture).</p>
+<p>Now we need to define the <code>privateSetter</code> annotation we can use in our classes.  It&#8217;s a fairly simple file:</p>
+<p><div class="highlight"><pre><span class="k">package</span> <span class="nn">org.scala_lang.privateSetter</span><br />
+<span class="k">class</span> <span class="nc">privateSetter</span> <span class="k">extends</span> <span class="nc">StaticAnnotation</span> <span class="o">{</span><br />
+<span class="o">}</span><br />
+</pre></div><br />
+Next we need to write the plugin itself.  All plugins contain some boiler-plate code, so we&#8217;ll ignore that for the time being. (<em>see the <a href="http://www.scala-lang.org/node/140">documentation mentioned above</a> _</em>).  The truly interesting part of this plugin is the newly defined phase.</p>
+<p>For some history, the Scala Compiler (scalac) is composed of various &#8220;phases&#8221;.  Each phase has a responsibility it performs.  Some phases are easy to identifier e.g. &#8220;icode&#8221; which converts the <span class="caps">AST</span> to icode for each &#8220;compilation unit&#8221;.  In the Scala Compiler a compilation unit corresponds to a source code file and may produce multiple class files.  Here&#8217;s the <code>scalac -Xlist-phases</code> output on my machine:</p>
+<p></notextile></p>
+<p>On to our implementation!  The basic structure of our phase looks like this:</p>
+<p><div class="highlight"><pre>    <span class="k">class</span> <span class="nc">MakeSettersPrivatePhase</span><span class="o">(</span><span class="n">prev</span><span class="k">:</span> <span class="kt">Phase</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">Phase</span><span class="o">(</span><span class="n">prev</span><span class="o">)</span> <span class="o">{</span><br />
+      <br />
+      <span class="k">override</span> <span class="k">def</span> <span class="n">name</span> <span class="k">=</span> <span class="nc">VarAccessChanger</span><span class="o">.</span><span class="k">this</span><span class="o">.</span><span class="n">name</span><br />
+      <span class="k">import</span> <span class="nn">global._</span><br />
+      <span class="k">override</span> <span class="k">def</span> <span class="n">run</span> <span class="o">{</span><br />
+ <span class="k">for</span> <span class="o">(</span><span class="n">unit</span> <span class="k">&lt;-</span> <span class="n">global</span><span class="o">.</span><span class="n">currentRun</span><span class="o">.</span><span class="n">units</span><span class="o">;</span> <span class="k">if</span> <span class="o">!</span><span class="n">unit</span><span class="o">.</span><span class="n">isJava</span><span class="o">)</span> <span class="o">{</span><br />
+           <span class="n">unit</span><span class="o">.</span><span class="n">body</span> <span class="k">=</span> <span class="nc">TreeTransformer</span><span class="o">.</span><span class="n">transform</span><span class="o">(</span><span class="n">unit</span><span class="o">.</span><span class="n">body</span><span class="o">)</span>      <br />
+ <span class="o">}</span><br />
+      <span class="o">}</span><br />
+      <span class="o">&#8230;</span><br />
+<span class="o">}</span><br />
+</pre></div><br />
+I&#8217;ll mention that this class is nested inside an outer &#8220;Plugin&#8221; class which is passed the &#8216;global&#8217; object.  For those of you unfamiliar with the compiler, the &#8220;Global&#8221; object is the outer layer of the &#8220;cake&#8221; pattern used by the Scala Compiler.  I&#8217;m reserving judgment on Global, but I have noticed that it&#8217;s very hard to unit test any &#8220;module&#8221; you write for Global (as most of them have the <code>self:Global =&gt;</code> syntax).</p>
+<p>The Transformer is a very nice class for doing <span class="caps">AST</span> manipulation (thanks <span class="caps">DRM</span> for suggesting it).   This class simply transforms the <span class="caps">AST</span> from one form to another.  It&#8217;s perhaps the easiest way to implement our plugin.  Let&#8217;s set up a Tree Transformation that does absolutely nothing useful:</p>
+<p><div class="highlight"><pre>      <span class="k">object</span> <span class="nc">TreeTransformer</span> <span class="k">extends</span> <span class="nc">Transformer</span> <span class="o">{</span><br />
+<br />
+        <span class="k">override</span> <span class="k">def</span> <span class="n">transform</span><span class="o">(</span><span class="n">tree</span><span class="k">:</span> <span class="kt">Tree</span><span class="o">)</span> <span class="k">=</span> <span class="n">tree</span> <span class="k">match</span> <span class="o">{</span><br />
+         <span class="k">case</span> <span class="n">t</span> <span class="k">=&gt;</span>         <br />
+           <span class="k">super</span><span class="o">.</span><span class="n">transform</span><span class="o">(</span><span class="n">t</span><span class="o">)</span><br />
+        <span class="o">}</span><br />
+      <span class="o">}</span><br />
+</pre></div><br />
+<br />
+The structure here is we override the transform method.  This method takes a tree and returns a tree.  We want to transform <strong>only</strong> the setter part of a var method if it contains the privateSetter annotation.   Let&#8217;s apply our pattern matching skills to the test with an extractor:  The &#8220;AnnotationSetterShouldBePrivate&#8221; extractor.</p>
+<p><div class="highlight"><pre><span class="k">object</span> <span class="nc">AnnotatedSetterShouldBePrivate</span> <span class="o">{</span><br />
+<br />
+  <span class="k">def</span> <span class="n">unapply</span><span class="o">(</span><span class="n">node</span> <span class="k">:</span> <span class="kt">Tree</span><span class="o">)</span> <span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">DefDef</span><span class="o">]</span> <span class="o">=</span> <span class="o">{</span><br />
+<br />
+    <span class="k">def</span> <span class="n">hasPrivateSetterAnnotation</span><span class="o">(</span><span class="n">annotations</span> <span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Annotation</span><span class="o">])</span> <span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="o">{</span><br />
+      <span class="k">for</span> <span class="o">{</span><br />
+           <span class="n">annotation</span> <span class="k">&lt;-</span> <span class="n">annotations</span><br />
+           <span class="k">if</span> <span class="n">annotation</span><span class="o">.</span><span class="n">tpe</span><span class="o">.</span><span class="n">safeToString</span> <span class="o">==</span> <span class="n">classOf</span><span class="o">[</span><span class="kt">privateSetter</span><span class="o">].</span><span class="n">getName</span><br />
+      <span class="o">}</span> <span class="o">{</span><br />
+        <span class="k">return</span> <span class="kc">true</span><br />
+      <span class="o">}</span><br />
+      <span class="kc">false</span><br />
+    <span class="o">}</span><br />
+    <br />
+    <span class="n">node</span> <span class="k">match</span> <span class="o">{</span><br />
+      <span class="k">case</span> <span class="n">x</span> <span class="k">@</span> <span class="nc">DefDef</span><span class="o">(</span><span class="n">mods</span><span class="o">,</span><span class="n">name</span><span class="o">,</span><span class="k"><em></span><span class="o">,</span><span class="k"></em></span><span class="o">,</span><span class="k"><em></span><span class="o">,</span><span class="k"></em></span><span class="o">)</span> <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">toString</span><span class="o">.</span><span class="n">endsWith</span><span class="o">(</span><span class="s">&quot;<em>$eq&quot;</span><span class="o">)</span> <span class="k">=&gt;</span><br />
+         <span class="k">if</span><span class="o">(</span><span class="n">hasPrivateSetterAnnotation</span><span class="o">(</span><span class="n">mods</span><span class="o">.</span><span class="n">annotations</span><span class="o">)){</span><br />
+            <span class="nc">Some</span><span class="o">(</span><span class="n">x</span><span class="o">)</span><br />
+         <span class="o">}</span> <span class="k">else</span> <span class="o">{</span><br />
+            <span class="nc">None</span><br />
+         <span class="o">}</span><br />
+      <span class="k">case</span> <span class="k"></em></span> <span class="k">=&gt;</span> <span class="nc">None</span><br />
+    <span class="o">}</span><br />
+  <span class="o">}</span><br />
+<span class="o">}</span><br />
+</pre></div><br />
+First, note that our extractor (unapply method) takes in a tree and returns a DefDef.  DefDef is the <span class="caps">AST</span> class for a &#8220;def&#8221; node.   All var&#8217;s are parsed into dual &#8220;def&#8221; methods (setter and getter).  We define a helper method that takes a list of annotations and looks for our &#8220;privateSetter&#8221; annotation.   The actually implementation of the extractor matches against the tree node, checks to see if it&#8217;s a DefDef and has a tailing name of &#8220;_$eq&#8221;.   &#8220;_$eq&#8221; is the mangled form of &#8220;_=&#8221; which is the convention for scala setter methods.  Note that I probably could move the if/else statement into the pattern match on the DefDef, but wasn&#8217;t feeling adventurous enough this evening.  In the case where we find a valid annotated setter DefDef method, we return it, otherwise return None.</p>
+<p>Now that we have our extractor, writing the tree transformation becomes fairly simple:</p>
+<p><div class="highlight"><pre><span class="k">object</span> <span class="nc">TreeTransformer</span> <span class="k">extends</span> <span class="nc">Transformer</span> <span class="o">{</span><br />
+    <br />
+  <span class="k">override</span> <span class="k">def</span> <span class="n">transform</span><span class="o">(</span><span class="n">tree</span><span class="k">:</span> <span class="kt">Tree</span><span class="o">)</span> <span class="k">=</span> <span class="n">tree</span> <span class="k">match</span> <span class="o">{</span><br />
+      <span class="k">case</span> <span class="nc">AnnotatedSetterShouldBePrivate</span><span class="o">(</span><span class="n">d</span> <span class="k">@</span> <span class="nc">DefDef</span><span class="o">(</span><span class="n">mods</span><span class="o">,</span><span class="n">name</span><span class="o">,</span><span class="n">tparams</span><span class="o">,</span><span class="n">vparams</span><span class="o">,</span><span class="n">tpt</span><span class="o">,</span><span class="n">impl</span><span class="o">))</span> <span class="k">=&gt;</span> <br />
+          <span class="k">import</span> <span class="nn">symtab.Flags._</span><br />
+          <span class="k">val</span> <span class="n">tree</span> <span class="k">=</span> <span class="n">copy</span><span class="o">.</span><span class="nc">DefDef</span><span class="o">(</span><span class="n">d</span><span class="o">,</span> <span class="n">mods</span> <span class="o">|</span> <span class="nc"><span class="caps">PRIVATE</span></span><span class="o">,</span><span class="n">name</span><span class="o">,</span><span class="n">tparams</span><span class="o">,</span><span class="n">vparams</span><span class="o">,</span><span class="n">tpt</span><span class="o">,</span><span class="n">transform</span><span class="o">(</span><span class="n">impl</span><span class="o">))</span><br />
+          <span class="n">tree</span><span class="o">.</span><span class="n">symbol</span><span class="o">.</span><span class="n">setFlag</span><span class="o">(</span><span class="nc"><span class="caps">PRIVATE</span></span><span class="o">)</span>              <br />
+          <span class="n">tree</span><br />
+      <span class="k">case</span> <span class="n">t</span> <span class="k">=&gt;</span><br />
+          <span class="k">super</span><span class="o">.</span><span class="n">transform</span><span class="o">(</span><span class="n">t</span><span class="o">)</span><br />
+  <span class="o">}</span><br />
+<span class="o">}</span><br />
+</pre></div><br />
+As you can see, we&#8217;re combining our &#8220;AnnotatedSetterShouldBePrivate&#8221; extractor with the natural extractor for the DefDef case class so that we can pull out all the constructor variables (along with the DefDef itself using the &#8220;d @&#8221; syntax).  Initially I tried returning just a newly constructed DefDef with &#8220;mods | <span class="caps">PRIVATE</span>&#8221; instead of &#8220;mods&#8221; in the constructor.  You&#8217;ll find this blows up horribly.   The main issue is that the <span class="caps">AST</span> nodes contain <strong>more</strong> than just their constructor values (types and symbols being the two things I found).   The Transformer class provides a &#8220;copy&#8221; value/object that you can use to &#8220;copy&#8221; various parts of the tree.   The copy class contains a method for every tree node that takes an original tree and overriding constructor values.  For our purposes, we&#8217;re applying the <span class="caps">PRIVATE</span> flag to the &#8220;mods&#8221; attribute of the DefDef and two the symbol flags for the DefDef.  The symbol flags are what are eventually used in the icode&#8594;bytecode conversion code.</p>
+<p>Next we should choose what phase to run this plugin after.  I&#8217;ve chosen the &#8220;typer&#8221; phase, as this ensures we at least have an <span class="caps">AST</span> and the types are correct.  When defining a class in isolation, this is working perfectly.  However when defining the class and using it with other classes, I&#8217;m running into the difficulty where the methods I&#8217;m modifying are eventually being replaced with public methods of a differing names.  To look into this, we should set up some integration tests.  <span class="caps">NOW</span> we can use the <span class="caps">SHITTY</span> plugin!</p>
+<p>The maven shitty plugin allows you to execute &#8220;integration&#8221; projects that depend on the currently &#8220;building&#8221; project.   You simple create a directory in src/it, add a pom.xml that depends on your project (with a version of &#8220;testing&#8221;), and a goal.txt that describes which maven goals should be executed.   If the integration project&#8217;s maven build succeeds, the overall project&#8217;s maven build continues.  If an integration project&#8217;s maven build fails, the entire build fails.  This works great for &#8220;positive&#8221; tests (or test where you make sure that things compile with your plugin).   Let&#8217;s define a relatively simple positive test.   First, we take the class outlined earlier as our example syntax:<br />
+<div class="highlight"><pre><span class="k">package</span> <span class="nn">org.scala_lang.privateSetter<div class="highlight"><pre><span class="k">package</span> <span class="nn">org.scala_lang.privateSetter</span></p>
+<p><span class="k">class</span> <span class="nc">privateSetter</span> <span class="k">extends</span> <span class="nc">StaticAnnotation</span> <span class="o">{</span><br />
+<span class="o">}</span><br />
+</pre></div></notextile></p>
+<p>Next we create a pom file for this integration test:</p>
+<p><div class="highlight"><pre><span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">&quot;http://maven.apache.org/<span class="caps">POM</span>/4.0.0&quot;</span> <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br />
+ <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://maven.apache.org/<span class="caps">POM</span>/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd&quot;</span><span class="nt">&gt;</span><br />
+ <span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span><br />
+ <span class="nt">&lt;groupId&gt;</span>org.scala-tools<span class="nt">&lt;/groupId&gt;</span><br />
+ <span class="nt">&lt;artifactId&gt;</span>testPrivateSetter<span class="nt">&lt;/artifactId&gt;</span><br />
+ <span class="nt">&lt;packaging&gt;</span>jar<span class="nt">&lt;/packaging&gt;</span><br />
+ <span class="nt">&lt;version&gt;</span>1.0-<span class="caps">SNAPSHOT</span><span class="nt">&lt;/version&gt;</span><br />
+ <span class="nt">&lt;name&gt;</span>test-privateSetter-scalac-plugin<span class="nt">&lt;/name&gt;</span><br />
+ <span class="nt">&lt;dependencies&gt;</span><br />
+  <span class="nt">&lt;dependency&gt;</span><br />
+   <span class="nt">&lt;groupId&gt;</span>org.scala-lang<span class="nt">&lt;/groupId&gt;</span><br />
+   <span class="nt">&lt;artifactId&gt;</span>private-setter-scalac-plugin<span class="nt">&lt;/artifactId&gt;</span><br />
+   <span class="nt">&lt;version&gt;</span>testing<span class="nt">&lt;/version&gt;</span><br />
+  <span class="nt">&lt;/dependency&gt;</span><br />
+  <span class="nt">&lt;dependency&gt;</span><br />
+   <span class="nt">&lt;groupId&gt;</span>junit<span class="nt">&lt;/groupId&gt;</span><br />
+   <span class="nt">&lt;artifactId&gt;</span>junit<span class="nt">&lt;/artifactId&gt;</span><br />
+   <span class="nt">&lt;version&gt;</span>4.5<span class="nt">&lt;/version&gt;</span><br />
+   <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span><br />
+  <span class="nt">&lt;/dependency&gt;</span><br />
+ <span class="nt">&lt;/dependencies&gt;</span><br />
+ <span class="nt">&lt;build&gt;</span><br />
+  <span class="nt">&lt;plugins&gt;</span><br />
+   <span class="nt">&lt;plugin&gt;</span><br />
+    <span class="nt">&lt;groupId&gt;</span>org.scala-tools<span class="nt">&lt;/groupId&gt;</span><br />
+    <span class="nt">&lt;artifactId&gt;</span>maven-scala-plugin<span class="nt">&lt;/artifactId&gt;</span><br />
+    <span class="nt">&lt;executions&gt;</span><br />
+     <span class="nt">&lt;execution&gt;</span><br />
+      <span class="nt">&lt;goals&gt;</span><br />
+       <span class="nt">&lt;goal&gt;</span>add-source<span class="nt">&lt;/goal&gt;</span><br />
+       <span class="nt">&lt;goal&gt;</span>compile<span class="nt">&lt;/goal&gt;</span><br />
+      <span class="nt">&lt;/goals&gt;</span><br />
+     <span class="nt">&lt;/execution&gt;</span><br />
+    <span class="nt">&lt;/executions&gt;</span><br />
+    <span class="nt">&lt;configuration&gt;</span><br />
+     <span class="nt">&lt;compilerPlugins&gt;</span><br />
+      <span class="nt">&lt;dependency&gt;</span><br />
+       <span class="nt">&lt;groupId&gt;</span>org.scala-lang<span class="nt">&lt;/groupId&gt;</span><br />
+       <span class="nt">&lt;artifactId&gt;</span>private-setter-scalac-plugin<span class="nt">&lt;/artifactId&gt;</span><br />
+       <span class="nt">&lt;version&gt;</span>testing<span class="nt">&lt;/version&gt;</span><br />
+      <span class="nt">&lt;/dependency&gt;</span><br />
+     <span class="nt">&lt;/compilerPlugins&gt;</span><br />
+     <span class="nt">&lt;args&gt;</span><br />
+      <span class="nt">&lt;arg&gt;</span>-verbose<span class="nt">&lt;/arg&gt;</span><br />
+     <span class="nt">&lt;/args&gt;</span><br />
+    <span class="nt">&lt;/configuration&gt;</span><br />
+   <span class="nt">&lt;/plugin&gt;</span><br />
+  <span class="nt">&lt;/plugins&gt;</span><br />
+ <span class="nt">&lt;/build&gt;</span><br />
+<br />
+ <span class="nt">&lt;repositories&gt;</span><br />
+  <span class="nt">&lt;repository&gt;</span><br />
+   <span class="nt">&lt;id&gt;</span>scala-tools.org<span class="nt">&lt;/id&gt;</span><br />
+   <span class="nt">&lt;name&gt;</span>Scala-tools Maven2 Repository<span class="nt">&lt;/name&gt;</span><br />
+   <span class="nt">&lt;url&gt;</span>http://scala-tools.org/repo-releases<span class="nt">&lt;/url&gt;</span><br />
+  <span class="nt">&lt;/repository&gt;</span><br />
+ <span class="nt">&lt;/repositories&gt;</span><br />
+ <span class="nt">&lt;pluginRepositories&gt;</span><br />
+  <span class="nt">&lt;pluginRepository&gt;</span><br />
+   <span class="nt">&lt;id&gt;</span>scala-tools.org<span class="nt">&lt;/id&gt;</span><br />
+   <span class="nt">&lt;name&gt;</span>Scala-tools Maven2 Repository<span class="nt">&lt;/name&gt;</span><br />
+   <span class="nt">&lt;url&gt;</span>http://scala-tools.org/repo-releases<span class="nt">&lt;/url&gt;</span><br />
+  <span class="nt">&lt;/pluginRepository&gt;</span> <br />
+  <span class="nt">&lt;pluginRepository&gt;</span><br />
+   <span class="nt">&lt;id&gt;</span>snapshots.scala-tools.org<span class="nt">&lt;/id&gt;</span><br />
+   <span class="nt">&lt;name&gt;</span>Scala-tools Maven2 Snapshot Repository<span class="nt">&lt;/name&gt;</span><br />
+   <span class="nt">&lt;url&gt;</span>http://scala-tools.org/repo-snapshots<span class="nt">&lt;/url&gt;</span><br />
+  <span class="nt">&lt;/pluginRepository&gt;</span><br />
+ <span class="nt">&lt;/pluginRepositories&gt;</span><br />
+<br />
+<span class="nt">&lt;/project&gt;</span><br />
+</pre></div>You&#8217;ll notice we&#8217;re making us of the &#8220;testing&#8221; version of our plugin <span class="caps">AND</span> the &#8220;compilerPlugin&#8221; configuration option of the maven-scala-plugin.   This option is new to the (not yet released except as a <span class="caps">SNAPSHOT</span>) 2.10 version, and allows you to depend on any number of scalac plugins during your build.  We&#8217;re using it now to depend on our build.  Our goals.txt simply consists of &#8220;clean compile&#8221;.</p>
+<p>Another thing that the <span class="caps">SHITTY</span> plugin lets you do is provide a &#8216;validate.groovy&#8217; file with your pom.xml and goals.txt.   This file is run after a build to ensure things were successful.   We can use this to ensure our generated classfiles have private setters.  We&#8217;ll tackle that problem another day (I&#8217;m currently being lame and running javap on the .class files).</p>
+<p>I think I&#8217;ve typed as much as I can for one night, I&#8217;ll try to cover the remaining pieces (after I code/finish them) later.  Once again, there are some issues with the plugin as I&#8217;m confusing the hell out of some of the compiler phases (not to mention being confused myself as to where things happen in some cases).  If you&#8217;d like to look at the source (and perhaps contribute? ), it&#8217;s available on github: <a href="http://github.com/jsuereth/private-setter-scalac-plugin/tree/master">private-setter-scalac-plugin</a></p>
+  </div>
+  <div id="widgetbar" class="span-4 last">
+      <div id="related">
+        <h2>Related Posts</h2>
+        <div class="box">
+          <ul class="posts">
+            
+              <li><span>20 Feb 2009</span> &raquo; <a href="/2009/02/20/new-blog-site.html">New Blog Site</a></li>
+            
+              <li><span>08 Dec 2008</span> &raquo; <a href="/2008/12/08/subclassing-in-extjs.html">Subclassing in ExtJS</a></li>
+            
+          </ul>
+        </div>
+      </div>
+  </div>   
+
+  </div>
+  <div id="footer" class="span-24 last">
+      <p>
+        Josh Suereth<br />
+        Software Engineer
+      </p>
+  </div>  
+</div>
+
+</body>
+</html>
