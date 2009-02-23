@@ -39,6 +39,8 @@ div.widgetbar {
   padding-top: 5px;
   padding-bottom: 5px;  
 }
-
+.header h1 {
+  text-align: center;
+}
 div.lefthand {
 }
