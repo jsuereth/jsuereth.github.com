@@ -2,9 +2,8 @@
 layout: default
 ---
 
-  <div id="entry" class="span-16">  
+  <div id="entry" class="mainbody span-16">  
     {{ content }}
-    
     
     <!-- Digg + Reddit + Dzone widget -->
     <div style='float:right; margin-left:10px;'>
@@ -16,17 +15,7 @@ layout: default
         <script language='javascript' src='http://reddit.com/button.js?t=2'></script>     
     </div>
   </div>
-  <div id="widgetbar" class="span-4 last">
-      <div id="related" class="span-4">
-        <h2>Related Posts</h2>
-        <div class="box" class="span-3 last">
-          <ul class="posts">
-            {% for post in site.related_posts limit:3 %}
-              <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
-            {% endfor %}
-          </ul>
-        </div>
-      </div>
+  <div class="widgetbar span-4 last">      
       <div id="twitter_div" class="span-4">
         <h3>Related tweets</h3>     
         <ul id="twitter_update_list"></ul>

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Subclassing in ExtJS
-category: ajax
+categories: ajax extjs
 ---
 
 It's been a while since I posted about ExtJS, so I thought I'd take a crack at another post here.  This is going to cover the @Ext.extend@ method, and how you go about sub-classing an Ext component.

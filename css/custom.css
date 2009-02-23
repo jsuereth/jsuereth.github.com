@@ -1,7 +1,9 @@
 pre {
   overflow: auto;
 }
-
+body {
+  background: #3d71bf;
+}
 
 #twitter-widget li {
   list-style: none;
@@ -15,4 +17,28 @@ pre {
 
 #twitter-widget .user {
   color: blue;
+}
+
+ul.post-list {
+  list-style: none;
+  margin-left: 0px;
+}
+
+ul.post-list li {
+  list-style: none;
+}
+
+div.container {
+  background: #fff;
+}
+
+div.widgetbar {
+}
+.widgetbar h3 {
+  background: #E5D1B1;
+  padding-top: 5px;
+  padding-bottom: 5px;  
+}
+
+div.lefthand {
 }
