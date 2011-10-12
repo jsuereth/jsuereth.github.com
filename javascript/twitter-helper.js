@@ -88,7 +88,7 @@ twitter.renderTweet = function(tweet) {
 function twitterCallback2(data) {
    var results = data.results;
    var tweets=[];
-   for(var idx=0; idx < results.length; idx++) { 
+   for(var idx=0; idx < results.length && idx < 6; idx++) { 
          tweets.push('<li>',twitter.renderTweet(results[idx]),'</li>');
    }   
    document.getElementById("twitter_update_list").innerHTML=tweets.join("")
