@@ -1,0 +1,15 @@
+    <!-- Topbar
+    ================================================== -->
+    <div class="topbar" >
+      <div class="topbar-inner">
+        <div class="container">
+          <a class="brand" href="/">Josh Suereth</a>
+          <ul class="nav">
+           <li><a href="http://www.typesafe.com">Typesafe, Inc.</a></li>
+           <li><a href="http://www.manning.com/suereth">Scala In Depth</a></li>
+           <li><a href="http://www.scalatypes.com">Scalatypes Podcast</a></li>
+           <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>

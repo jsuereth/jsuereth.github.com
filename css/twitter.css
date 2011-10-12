@@ -1,0 +1,19 @@
+#twitter-widget li {
+  list-style: none;
+  padding-bottom: 1em;
+}
+
+#twitter-widget ul {
+  margin: 0px;  
+}
+
+#twitter-widget .user {
+  color: blue;
+}
+
+#twitter-widget .user img {
+  height: 30px;
+  width: 30px;
+  padding-right: 6px;
+  vertical-align: middle;
+}

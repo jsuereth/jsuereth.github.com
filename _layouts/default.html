@@ -1,68 +1,19 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+{% include header.txt %}
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-   <meta name="verify-v1" content="Wk/82PweoQgGS2hKzvuOfgyruzN6SP12BtUz0l0KJQM=" />
-   <title>{{ page.title }}</title>
-   <meta name="author" content="Josh Suereth" />
+{% include topbar.txt %}
 
-   <!-- Homepage CSS -->
-   <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection">
-   <link rel="stylesheet" href="/css/print.css" type="text/css" media="print">    
-   <!--[if IE]><link rel="stylesheet" href="/css/ie.css" type="text/css" media="screen, projection"><![endif]-->
-   
-   <!-- syntax highlighting CSS -->
-   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
-
-
-  <link rel="stylesheet" href="/css/custom.css" type="text/css" />
-</head>
-<body>
-
-<div class="container">
-  <div id="header" class="span-24 last">
-    <h1>Rants, Raves and Ridicule</h1>    
-  </div>
-  <hr/>
-  <div class="lefthand widgetbar span-4">
-    <h3>Navigation</h3>
-    <ul>
-         <li><strong><a href="/">Home</a></strong></li>
-         <li><a href="http://github.com/davidB/maven-scala-plugin/tree/master">Maven Scala Plugin</a></li>
-         <li><a href="/protocopter">Protocopter</a></li>
-         <li class="last"><a href="contact.html">Contact</a></li>
-    </ul>
-    <h3>All Posts</h3>
-    <ul class="post-list">
-      {% for post in site.posts %}
-        <li>&raquo; <a href="{{ post.url }}">{{ post.title }}</a> <span class="date">( {{ post.date | date: "%b %Y" }} )</span></li>
-      {% endfor %}      
-    </ul>
-  </div>
-  <div id="content" class="span-20 last">  
+<div class="row">
+  <div class="span2 columns"><p>&nbsp;</p></div>
+  <div class="span10 columns content">
     {{ content }}   
-
   </div>
-  <div id="footer" class="span-24 last">
-      <p>
-        Josh Suereth<br />
-        Software Engineer
-      </p>
-  </div>  
+  <div class="span4 columns blogroll">
+     <div class="container">
+       {% include allposts.txt %}
+     </div>
+     {% include twitter-widget.txt %}
+  </div>
 </div>
 
-<script type="text/javascript">
-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-<script type="text/javascript">
-try{
-var pageTracker = _gat._getTracker("UA-5651872-1");
-pageTracker._trackPageview();
-} catch(err) {}
-</script>
 
-</body>
-</html>
+{% include footer.txt %}

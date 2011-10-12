@@ -5,17 +5,17 @@ category: cpp
 ---
 
 
-''Note: Due to excessive comments about my grasp of the english languages, I've done a second round of editing for this post.  It may show up on the RSS feed again, but there isn't any new content.''
+__Note: Due to excessive comments about my grasp of the english languages, I've done a second round of editing for this post.  It may show up on the RSS feed again, but there isn't any new content.__
 
 I've recently had to jump into a bit of (very minor) C++ development at work.  This started bringing back memories of all the ?fun? it was to play around in the C++ type system.  Mostly you use the C++ type system in an attempt to prevent yourself from doing bad things. Sometimes though, it was a way of doing conditional compilation in a type-safe manner.
 
 I recently decided to outline how I tend to over-engineer my C++ code.  I'll give a few ground rules/goals first:
-* I won't use boost.  In real life, I do use boost whenever I can.  For the purposes of illustration I'm doing a lot by hand.  If you're a C++ developer and you don't use boost, go learn it. Now.  Really, I mean right now go to "www.boot.org":http://www.boost.org and enter the 21st century of coding.  No really, GO
+* I won't use boost.  In real life, I do use boost whenever I can.  For the purposes of illustration I'm doing a lot by hand.  If you're a C++ developer and you don't use boost, go learn it. Now.  Really, I mean right now go to [www.boost.org](http://www.boost.org) and enter the 21st century of coding.  No really, GO
 * I'm not doing detailed explanations (although I do some explanations) of the C++ language or its compiler workings.
 * This could be an attempt to ramp myself to attack learning scala's (and maybe haskell's) type sytem.  C++ is the closest typed language I know that could prepare me
 * C++/Java feels more like masochism the more new languages I learn.  I'm hoping this "simple" post about using the C++ type system in a "simple" way will prove this to you.  At some point I hope to post a Scala/Haskell equivalent to this post (or perhaps someone else would like to?) just so you can see the amount of work C++ really requires (and the level of understanding required to write even a simple line).
 
-Alright! so first off, the premise:  ''We're trying to create a class (DynamicLibrary) that will let us dynamic load a shared library and access symbols.'' I'm only including code for linux (although porting to windows or "cross-platforming" isn't too bad. look into the LoadLibrary function in windows and dlopen in linux).
+Alright! so first off, the premise:  __We're trying to create a class (DynamicLibrary) that will let us dynamic load a shared library and access symbols.__ I'm only including code for linux (although porting to windows or "cross-platforming" isn't too bad. look into the LoadLibrary function in windows and dlopen in linux).
 
 Before we begin, I'm going to construct something (available in boost) that should be in the utility kit of every C++ developer... a base class that removes the copy-constructor and operator= from visibility (effectively making it non-copyable)
 
@@ -44,14 +44,16 @@ private:
 It's a very simple class.  Most of its functions are purposefully inlined.  It should get compiled out during optimization phases, AND it can reduce typing for me later when I don't want a class copied around on the stack.
 (Note: I could have saved one line of typing by changing to a struct and getting rid of the public: line. or putting all private functions first.  Sue me, but I prefer this look).
 
-Ok, next we're going to create a very small Meta-Programming Library.  This library will be used to tell us all sorts of information about the types in C++.  For now, please assume all these examples are surrounded in a namespace mpl {} block.
+Ok, next we're going to create a very small Meta-Programming Library.  This library will be used to tell us all sorts of information about the types in C++.  For now, please assume all these examples are surrounded in a `namespace mpl {}` block.
 
 Here's our first bout of magic:
+
 {% highlight cpp %}
 struct true_;
 struct false_;  //Not really needed, but easier to understand if we have it
 {% endhighlight %}
-WTF? Why make two completely silly classes?  This is so I can represent the notion of a boolean in the type system. From now on, I want you to think of true_ as "true in the meta-programming library" and similarly for false_. <i>Note: In actuality I could probably use bool as a template parameter and get away with it, but this is more fun</i>
+
+WTF? Why make two completely silly classes?  This is so I can represent the notion of a boolean in the type system. From now on, I want you to think of `true_` as "true in the meta-programming library" and similarly for `false_`. <i>Note: In actuality I could probably use bool as a template parameter and get away with it, but this is more fun</i>
 
 Ok, now let's make a simple method just so we can print the boolean value of a type.  
 {% highlight cpp %}
@@ -66,10 +68,13 @@ struct is_true<true_>
  enum { value = 1 };
 };
 {% endhighlight %}
-So..... what is that?   That, my friends, is a C++ meta-programming function.  The first template applies to every type and "returns" a value of 0 (or false).  The second is a specialization for the true_ type that will return 1.  This means if we ever use the is_true structure with true_ as the argument, the "member" value will be 1.  Its a little convoluted (or convolved?), but it works!  How do you call it?  Simply like this:
+
+So..... what is that?   That, my friends, is a C++ meta-programming function.  The first template applies to every type and "returns" a value of `0` (or `false`).  The second is a specialization for the true_ type that will return `1`.  This means if we ever use the `is_true` structure with `true_` as the argument, the "member" value will be `1`.  Its a little convoluted (or convolved?), but it works!  How do you call it?  Simply like this:
+
 {% highlight cpp %}
 is_true<some type>::value.
 {% endhighlight %}
+
 That will return an actually value we can assign, test in an if statement or display on the console.  We're going for displaying on the console here (console = stdout).
 
 Ok, so let's get more interesting meta-functions.  The most important for what I'd like to do later is the "is_ptr" function.  Here's a look at it:
@@ -261,4 +266,4 @@ Ok, so this is a little bit limited, but we have it working! YAY!!!?
 
 In conclusion, I really want to get back into Scala again.  The type system seems a little bit less verbose, and the language itself is less clunky.
 
-''Note: I later updated this to pull string-literals out of libraries.  The fun part there was realizing that a symbol pointer to  a string literal is *really* a [char**] that needs to be dereferenced (carefully).  Basically I wrote a specialized std::string specialization of get_symbol that would perform the checks/casts and return a string.  The key to testing this was ensuring that the char* literal would wind up in the symbol table of the output .so.  This means you should make a dummy function that returns it, otherwise it may be optimized away.  Enjoy!''
+__Note: I later updated this to pull string-literals out of libraries.  The fun part there was realizing that a symbol pointer to  a string literal is *really* a `[char**]` that needs to be dereferenced (carefully).  Basically I wrote a specialized `std::string` specialization of `get_symbol` that would perform the checks/casts and return a `string`.  The key to testing this was ensuring that the `char*` literal would wind up in the symbol table of the output `.so`.  This means you should make a dummy function that returns it, otherwise it may be optimized away.  Enjoy!__

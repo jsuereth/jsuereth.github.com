@@ -1,17 +1,10 @@
-/**
- * Pulls from a twitter query stream and inserts tweets into the HTML.  Relies on no framework.
- * @param data
- *            The Twitter query result data
- */
-function twitterCallback2(data) {
-   var results = data.results;
-   var tweets=[];
-   for(var idx=0; idx < results.length; idx++) { 
-         var user=results[idx].from_user;
-         var tweetHTML=results[idx].text.replace(
+twitter = {};
+
+twitter.renderTweetText = function(text) {
+ return text.replace(
                /((https?|s?ftp|ssh)\:\/\/[^"\s\<\>]*[^.,;'">\:\s\<\>\)\]\!])/g,
                function(link){
-                  return '<a href="'+link+'">'+link+"</a>"
+                  return '<a href="'+link+'">'+link+"</a>";
                }).replace(/\B@([_a-z0-9]+)/ig,
                   function(atuser){
                      return atuser.charAt(0)+
@@ -19,25 +12,18 @@ function twitterCallback2(data) {
                      atuser.substring(1)+
                      '">'+
                      atuser.substring(1)+
-                     "</a>"
-                  });
-         tweets.push('<li><span class="user">'+user+'</span> - <br/><span class="tweet">'+
-               tweetHTML+
-               '</span> <a style="font-size:85%" href="http://twitter.com/'+
-               user+
-               "/statuses/"+
-               results[idx].id+
-               '">'+
-               relative_time(results[idx].created_at)+ 
-               "</a></li>")
-   }
-   
-   document.getElementById("twitter_update_list").innerHTML=tweets.join("")
+                     "</a>";
+                  }).replace(/\B#([_a-z0-9]+)/ig,
+                    function(hashtag){
+                      return '<a href="http://twitter.com/#!/search?q=%23'+
+                        hashtag.substring(1) +
+                        '">#'+
+                        hashtag.substring(1) + '</a>';
+                    });
 }
+
 /** borrowed from twitter API */
-function relative_time(C) {
-            var B=C.split(" ");
-         C=B[1]+" "+B[2]+", "+B[5]+" "+B[3];
+twitter.relative_time = function (C) {
          var A=Date.parse(C);
          var D=(arguments.length>1)?arguments[1]:new Date();
          var E=parseInt((D.getTime()-A)/1000);
@@ -69,3 +55,42 @@ function relative_time(C) {
             }
          }
       };
+
+twitter.renderTweet = function(tweet) {
+  var result = ['<div class="tweet row">'];
+  result.push('<div class="user span2 columns">');  
+  if(tweet.profile_image_url) {
+    result.push('<img src="');
+    result.push(tweet.profile_image_url);
+    result.push('"/>');
+  }
+  result.push(tweet.from_user);
+  result.push('</div>');
+  result.push('<div class="content span4 columns">');
+  result.push(twitter.renderTweetText(tweet.text));
+  result.push('     <a style="font-size:85%" href="http://twitter.com/');
+  result.push(tweet.from_user);
+  result.push('/statuses/');
+  result.push(tweet.id);
+  result.push('">');
+  result.push(twitter.relative_time(tweet.created_at));
+  result.push('</a>');
+  result.push('</div>');
+  result.push('</div>');
+  return result.join('');
+}
+
+/**
+ * Pulls from a twitter query stream and inserts tweets into the HTML.  Relies on no framework.
+ * @param data
+ *            The Twitter query result data
+ */
+function twitterCallback2(data) {
+   var results = data.results;
+   var tweets=[];
+   for(var idx=0; idx < results.length; idx++) { 
+         tweets.push('<li>',twitter.renderTweet(results[idx]),'</li>');
+   }   
+   document.getElementById("twitter_update_list").innerHTML=tweets.join("")
+}
+
