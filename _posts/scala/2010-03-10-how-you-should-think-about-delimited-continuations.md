@@ -194,7 +194,7 @@ trait Resource[+R] {
       def reflect[B]() : R @cps[B,B] = shift { k : (R => B) => flatMap(k) }
 }
 
-def resource[R &lt;: Closeable](acquire : => R) = new Resource[R] {
+def resource[R <: Closeable](acquire : => R) = new Resource[R] {
       override def flatMap[U](f : R => U) : U = {
         val x = acquire
         try {
@@ -213,18 +213,17 @@ Now, let's get really dirty and define an inversion on java.io.InputStream to de
 
 {% highlight scala %}
 def reflect[A <: InputStream](input : A) = new {
-      def each_line[B] : String @cps[B,List[B]] = shift { 
-          k : (String => B) =>
-        val b = new BufferedReader(new InputStreamReader(input))
-        var line = b.readLine
-        var list = ListBuffer[B]()
-        while(line != null) {
-          list += (k(line))
-          line = b.readLine
-        }
-        list.toList
-      }
+  def each_line[B] : String @cps[B,List[B]] = shift { k : (String => B) =>
+    val b = new BufferedReader(new InputStreamReader(input))
+    var line = b.readLine
+    var list = ListBuffer[B]()
+    while(line != null) {
+      list += (k(line))
+      line = b.readLine
     }
+    list.toList
+  }
+}
 {% endhighlight %}
 
 We've defined our reflect method to work on every line within the file.  It builds up a list and returns it as the final result.  You'll notice the shift call takes a function requiring a String and returning a "B".   The fun type-system issue we have to deal with here is you need to know the result of the reified continuation in the return value for each_line.   We'll get to that more in a moment, but for now make note of this.
