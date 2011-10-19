@@ -194,8 +194,8 @@ trait Resource[+R] {
       def reflect[B]() : R @cps[B,B] = shift { k : (R => B) => flatMap(k) }
 }
 
-def resource[R &lt;: Closeable](acquire : =&gt; R) = new Resource[R] {
-      override def flatMap[U](f : R =&gt; U) : U = {
+def resource[R &lt;: Closeable](acquire : => R) = new Resource[R] {
+      override def flatMap[U](f : R => U) : U = {
         val x = acquire
         try {
           f(x)
@@ -214,7 +214,7 @@ Now, let's get really dirty and define an inversion on java.io.InputStream to de
 {% highlight scala %}
 def reflect[A <: InputStream](input : A) = new {
       def each_line[B] : String @cps[B,List[B]] = shift { 
-          k : (String =&gt; B) =&gt;
+          k : (String => B) =>
         val b = new BufferedReader(new InputStreamReader(input))
         var line = b.readLine
         var list = ListBuffer[B]()
