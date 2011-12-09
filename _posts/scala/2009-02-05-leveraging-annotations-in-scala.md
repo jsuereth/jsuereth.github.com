@@ -110,7 +110,7 @@ Next we need a way for clients of our plugin to "notify" us that they want a var
 import org.scala_lang.privateSetter._
 class TestWidget {
   @privateSetter
-  var myVar = 5  
+  var myVar = 5
 }
 {% endhighlight %}
 
@@ -124,7 +124,7 @@ class privateSetter extends StaticAnnotation {
 }
 {% endhighlight %}
 
-Next we need to write the plugin itself.  All plugins contain some boiler-plate code, so we'll ignore that for the time being. (__see the (documentation mentioned above)[http://www.scala-lang.org/node/140] __).  The truly interesting part of this plugin is the newly defined phase.
+Next we need to write the plugin itself.  All plugins contain some boiler-plate code, so we'll ignore that for the time being. __(see the [documentation mentioned above](http://www.scala-lang.org/node/140))__.  The truly interesting part of this plugin is the newly defined phase.
 
 For some history, the Scala Compiler (scalac) is composed of various "phases".  Each phase has a responsibility it performs.  Some phases are easy to identifier e.g. `icode` which converts the AST to icode for each "compilation unit".  In the Scala Compiler a compilation unit corresponds to a source code file and may produce multiple class files.  Here's the `scalac -Xlist-phases` output on my machine:
 
