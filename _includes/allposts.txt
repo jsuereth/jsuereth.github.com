@@ -1,4 +1,4 @@
-<h3>Recent Posts <a href="/feed.rss"><img class="rss" src="/resources/rss.jpg"/></a></h3>
+<h3>Recent Posts <a href="/feed.rss"><img class="rss" src="/resources/rss.png"/></a></h3>
 <ul class="post-list">
   {% for post in site.posts limit:5 %}
     <li><a href="{{ post.url }}">{{ post.title }}</a> <span class="date">( {{ post.date | date: "%b %Y" }} )</span></li>
