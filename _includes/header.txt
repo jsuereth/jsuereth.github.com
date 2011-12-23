@@ -13,5 +13,9 @@
    <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
    <link rel="stylesheet" href="/css/twitter.css" type="text/css" />
    <link rel="stylesheet" href="/css/colors.css" type="text/css" />
+   <link rel="stylesheet" href="/css/custom.css" type="text/css" />
+
+   <!-- RSS Feeds -->
+   <link href="{{site.url}}/feed.rss" rel="alternate" type="application/rss+xml" title="Recent posts on jsuereth.com" />
 </head>
 <body>
