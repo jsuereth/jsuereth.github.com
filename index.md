@@ -6,7 +6,7 @@ title: Josh Suereth
 
 # Welcome #
 
-I'm currently toying around with various formats for this blog.  Please bear with me.
+This is the landing page for all my nerdery.  I hope you enjoy.
 
 
 {% highlight scala %}
@@ -23,3 +23,6 @@ object BigNerd extends Career {
   def company = "http://typesafe.com"
 }
 {% endhighlight %}
+
+
+![Scala In Depth](http://www.manning.com/suereth/suereth_cover150.jpg) Scala In Depth is going through the final production phases!  Expect the remaining chapters soon.
