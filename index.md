@@ -24,5 +24,15 @@ object BigNerd extends Career {
 }
 {% endhighlight %}
 
+{% assign first_post = site.posts.first %}
 
-![Scala In Depth](http://www.manning.com/suereth/suereth_cover150.jpg) Scala In Depth is going through the final production phases!  Expect the remaining chapters soon.
+# Latest - {{ first_post.title }} #
+
+{{ first_post.content | truncatewords: 250 }}
+
+
+[Read More &raquo;]({{ first_post.url}})
+
+
+
+
