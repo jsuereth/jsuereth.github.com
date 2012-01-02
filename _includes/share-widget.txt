@@ -1,0 +1,7 @@
+<div id="share-widget" class="span6">
+  <h2> Share </h2>
+  <script type='text/javascript'>var dzone_url = "{{ post.url }}"; var dzone_title = "{{ post.title }}"; var dzone_blurb = "{{ post.title }}"; var dzone_style = "";</script>
+  <script language='javascript' src='http://widgets.dzone.com/widgets/zoneit.js'></script>         
+  <script>reddit_url="{{ post.url }}"; reddit_title="{{ post.title }}";</script>
+  <script language='javascript' src='http://reddit.com/button.js?t=2'></script>  
+</div>
