@@ -5,7 +5,7 @@ title: Scala Memes
 
 # A Collection of Scala Memes #
 
-The one that caputred our hearts...
+The one that captured our hearts...
 
 ![implicit cat](/resources/memes/implicit-cat.png)
 
