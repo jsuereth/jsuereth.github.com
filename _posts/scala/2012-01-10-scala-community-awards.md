@@ -4,6 +4,8 @@ title: Scala Community Awards
 category: scala
 ---
 
+*UPDATE* - Akka has weighed in on the award!
+
 Recently, a lot of Scala projects have moved to github!  This has drastically reduced the overhead of accepting community patches, and the community has been *wonderful* in making Scala and its documentation better.  The number of contributions and the care in commits shows that Scala has one of the best open source communities around!
 
 I plan to show statistics for the increase in community contributions for Scala, but I'm waiting a bit until we have some statistical relevance in contributions.  Right now, it's still to early to 'prove' anything, but the numbers appear to be tracking (if you ignore the blip known as Paul Phillips before he was a Typesafe employee).
@@ -39,6 +41,11 @@ Scala is one of the most difficult projects to contribute to in the Scala commun
 
 Also special thanks to Seth Tissue for ensuring great Java-Scala interaction and Jason Zaugg, who offers a free code review service for all of us contributors and has a fair number of impressive patches.  We have lots of users contributing testing fixes and patches, too many to name all of them here.  I hope to recognize you each individually over the coming quarters, so if your name was not listed, it's not because we don't appreciate you!  Everyone who has a closed pull request [here](https://github.com/scala/scala/pulls) deserves a beer! (Just ask me sometime and I'll provide).
 
+## Akka ##
+I was just going to cover the core Scala projects themselves, but my coworkers have nominated their picks for the Akka project as well!  With no further ado, the "Swell Contributor" awards go to:
+
+* Derek Williams - For revamping Futures and Dataflow
+* Martin Krasser - For the akka-camel module (with its amazing documentation).
 
 ## Fin ##
 
