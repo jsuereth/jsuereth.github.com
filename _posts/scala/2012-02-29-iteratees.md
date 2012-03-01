@@ -327,7 +327,7 @@ Here's a program with will perform the same calculations as the linux command li
 
 {% highlight scala %}
 import scalaz.nio.std._
-import scakaz.effect.IO
+import scalaz.effect.IO
 import scalaz.syntax.monad._
 import scalaz.nio.buffers._
 
@@ -371,4 +371,5 @@ It's my personal opinion that Iteratees demonstrate a lot of good design princip
 * Combinator operators to build large things from small things
 * Leveraging immutability to acccomplish the above.
 
+One aspect that I didn't get to delve into much is "Leveraging category theory for minimal implemenations with rich APIs".  Perhaps in a blog post covering Scalaz7.
 
