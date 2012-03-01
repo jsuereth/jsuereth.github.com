@@ -9,7 +9,7 @@
            <li><a href="http://www.typesafe.com">Typesafe, Inc.</a></li>
            <li><a href="http://www.manning.com/suereth">Scala In Depth</a></li>
            <li><a href="http://www.scalatypes.com">Scalatypes</a></li>
-           <li><a href="contact.html">Contact</a></li>
+           <li><a href="/contact.html">Contact</a></li>
           </ul>
         </div>
       </div>
