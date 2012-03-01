@@ -9,7 +9,8 @@ There's been a lot of hype about Iteratees in the past, as well as several good 
 
 Iteratees are an immutable implementation of a Consumer/Producer pattern.  A Consumer takes input and produces an output. A Consumer can have one of three states:
 
-,* Finished
+* Processing
+* Finished
 * Encountered an Error
 
 Let's look at a possible implementation.
@@ -18,7 +19,7 @@ Let's look at a possible implementation.
 sealed trait ConsumerState[I,A]
 case class Processing[I,A](f: I => Consumer[I,A]) extends ConsumerState[I,A]
 case class Done[I,A](result: A) extends ConsumerState[I,A]
-case class Error[I,A](t: Throwable) extends Consumer[I,A]
+case class Error[I,A](t: Throwable) extends ConsumerState[I,A]
 {% endhighlight %}
 
 The Processing state contains a function that takes input from a Producer, and returns the next consumer.  Remember that these are immutable, so any state change must return a new object.  The Done state contains the result of a given consumer, and the FatalError state holds a single java error representing what failed.  The actual consumer class will look like the following:
