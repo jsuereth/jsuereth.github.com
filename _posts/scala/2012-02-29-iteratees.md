@@ -363,3 +363,12 @@ def wc(file: java.io.File): String =
 In this example, the Consumers are being threaded through Scalaz's IO monad.  This is not a necessity of the library and in fact, my goal for the asynchronous bits is to use futures rather than IO to better represent the execution model.
 
 I hope that this has simplified your view of Iteratees.  They really are an amazingly flexible, elegant system of processing inputs and producing outputs.  I'm only at the beginnings of a decent Iteratee library, and already I can see the huge power in the ability to avoid re-streaming data through combining consumers.
+
+It's my personal opinion that Iteratees demonstrate a lot of good design principles of functional programming.
+
+* Implementing class state in terms of a 'fold' operation  (Note: We combine 'fold' with classical OO inheritance here).
+* Sequencing workflows inside a monadic context
+* Combinator operators to build large things from small things
+* Leveraging immutability to acccomplish the above.
+
+
