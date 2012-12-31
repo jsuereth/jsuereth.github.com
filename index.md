@@ -14,9 +14,9 @@ object ScalaInDepth extends Book {
   def url = "http://www.manning.com/suereth"
 }
 
-object Scalatypes extends Podcast {
-  def url = "http://www.scalatypes.com"
-  def cohosts = Seq("Daniel Spiewak", "Yuvi Masory")
+object Scalawags extends Podcast {
+  def url = "http://scalawags.tv"
+  def cohosts = Seq("Daniel Spiewak", "Dick Wall")
 }
 
 object BigNerd extends Career {
