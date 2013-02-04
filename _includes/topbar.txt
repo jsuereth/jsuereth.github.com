@@ -8,7 +8,7 @@
            <li><a href="/archive.html">Blog</a></li>
            <li><a href="http://www.typesafe.com">Typesafe, Inc.</a></li>
            <li><a href="http://www.manning.com/suereth">Scala In Depth</a></li>
-           <li><a href="https://plus.google.com/u/2/b/103832137805220517975/103832137805220517975">Scalawags</a></li>
+           <li><a href="http://scalawags.tv">Scalawags</a></li>
            <li><a href="/contact.html">Contact</a></li>
           </ul>
         </div>
