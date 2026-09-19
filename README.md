@@ -1,8 +1,6 @@
-# This is the data for my blog
+# jsuereth.com Main site
 
-It is automatically transformed by "Jekyll":http://github.com/mojombo/jekyll into a static site whenever I push this repository to GitHub.
-
-Thanks to Tom Preston-Werner for making this possible!
+Uses ZOLA to build a site.  Open source in case others are doing there own thing.
 
 ## LICENSE ##
 
