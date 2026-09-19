@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ config.title }}{% endblock title %}</title>
+  <meta name="description" content="{% block description %}{{ config.description }}{% endblock description %}">
+  <meta name="author" content="{{ config.extra.author }}">
+
+  <!-- OpenGraph / Twitter metadata -->
+  <meta property="og:title" content="{% block og_title %}{{ config.title }}{% endblock og_title %}">
+  <meta property="og:description" content="{% block og_desc %}{{ config.description }}{% endblock og_desc %}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ current_url | default(value=config.base_url) }}">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:creator" content="@jsuereth">
+
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!-- RSS / Atom Feed -->
+  <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="{{ get_url(path='atom.xml') }}">
+
+  <!-- Theme init script to avoid flash of unstyled theme -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container nav-wrapper">
+      <a href="/" class="site-title">
+        <span>Josh Suereth</span>
+      </a>
+      <nav class="site-nav">
+        <a href="/posts/">Thoughts</a>
+        <a href="/projects/">Projects</a>
+        <a href="/talks/">Talks</a>
+        <a href="/about/">About</a>
+        <a href="/atom.xml" title="Atom Feed">RSS</a>
+        <button id="theme-toggle-btn" class="theme-toggle-btn" aria-label="Toggle Dark Mode" title="Toggle theme">
+          <span id="theme-icon">🌓</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Body -->
+  <main class="main-content">
+    <div class="container">
+      {% block content %}{% endblock content %}
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <p>&copy; {{ now() | date(format="%Y") }} Josh Suereth. All rights reserved.</p>
+      <p>Built with <a href="https://www.getzola.org" target="_blank" rel="noopener">Zola</a> (Rust) &bull; Deployed via GitHub Actions</p>
+    </div>
+  </footer>
+
+  <!-- Inline Utilities (Theme toggle & Code copy) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Theme toggle
+      const btn = document.getElementById('theme-toggle-btn');
+      if (btn) {
+        btn.addEventListener('click', () => {
+          const currentTheme = document.documentElement.getAttribute('data-theme');
+          const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', newTheme);
+          localStorage.setItem('theme', newTheme);
+        });
+      }
+
+      // Code Block Copy Buttons
+      document.querySelectorAll('pre').forEach(pre => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-block-wrapper';
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-code-btn';
+        copyBtn.textContent = 'Copy';
+        copyBtn.addEventListener('click', () => {
+          const code = pre.querySelector('code')?.innerText || pre.innerText;
+          navigator.clipboard.writeText(code).then(() => {
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1800);
+          });
+        });
+        wrapper.appendChild(copyBtn);
+      });
+    });
+  </script>
+
+</body>
+</html>

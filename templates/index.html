@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="intro-section">
+  <h1 class="intro-greeting">Josh Suereth</h1>
+  <p class="intro-tagline">
+    Software engineer, open source maintainer, and author. Staff Software Engineer at Google focusing on cloud observability, and member of the <strong>OpenTelemetry Technical Committee</strong>. Previously spent a decade in the Scala ecosystem maintaining sbt and authoring <em>Scala in Depth</em>.
+  </p>
+
+  <div class="intro-links">
+    <a href="/projects/">Projects</a>
+    <span style="color: var(--border);">&bull;</span>
+    <a href="/talks/">Talks</a>
+    <span style="color: var(--border);">&bull;</span>
+    <a href="/about/">About</a>
+    <span style="color: var(--border);">&bull;</span>
+    <a href="{{ config.extra.github }}" target="_blank" rel="noopener">GitHub</a>
+    <span style="color: var(--border);">&bull;</span>
+    <a href="{{ config.extra.bluesky }}" target="_blank" rel="noopener">Bluesky</a>
+  </div>
+</div>
+
+<section style="margin-bottom: 2.5rem;">
+  <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.3em; margin-bottom: 1rem;">
+    <h2 style="border-bottom: none; margin: 0; padding: 0; font-size: 1.25rem;">Recent Thoughts</h2>
+    <a href="/posts/" style="font-size: 0.88rem; font-weight: 500;">All Thoughts (30+) &rarr;</a>
+  </div>
+
+  {% set posts_section = get_section(path="posts/_index.md") %}
+  <ul class="post-list">
+    {% for page in posts_section.pages %}
+      {% if loop.index <= 8 %}
+      <li class="post-item">
+        <div class="post-item-meta">
+          <time datetime="{{ page.date }}">{{ page.date | date(format="%B %d, %Y") }}</time>
+          {% if page.taxonomies.categories %}
+            &bull;
+            <span class="post-badge">{{ page.taxonomies.categories[0] }}</span>
+          {% endif %}
+          &bull;
+          <span>{{ page.reading_time }} min read</span>
+        </div>
+        <h3 class="post-item-title">
+          <a href="{{ page.permalink }}">{{ page.title }}</a>
+        </h3>
+      </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+</section>
+
+<section>
+  <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.3em; margin-bottom: 1rem;">
+    <h2 style="border-bottom: none; margin: 0; padding: 0; font-size: 1.25rem;">Active Areas</h2>
+  </div>
+  <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 0.5rem;">
+    Currently focused on <strong>OpenTelemetry</strong> standards and semantic conventions via <a href="https://github.com/open-telemetry/weaver">Weaver</a>, low-latency telemetry persistence with <a href="https://github.com/jsuereth/otlp-mmap">otlp-mmap</a>, and systems programming in <strong>Rust</strong>. Explore <a href="/projects/">Projects</a> or see recent conference <a href="/talks/">Talks</a>.
+  </p>
+</section>
+{% endblock content %}

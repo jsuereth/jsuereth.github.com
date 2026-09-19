@@ -1,0 +1,29 @@
+# The URL the site will be built for
+base_url = "https://jsuereth.com"
+title = "Josh Suereth"
+description = "Josh Suereth's technical writing, systems architecture, and engineering reflections."
+default_language = "en"
+
+# Feeds
+generate_feeds = true
+feed_filenames = ["atom.xml"]
+
+# Taxonomies
+taxonomies = [
+    { name = "categories", feed = true }
+]
+
+# Link Checker
+[link_checker]
+internal_level = "error"
+external_level = "warn"
+
+[markdown.highlighting]
+theme = "material-theme-palenight"
+
+[extra]
+author = "Josh Suereth"
+bio = "Software engineer, author of Scala in Depth & sbt in Action. Systems & Rust enthusiast."
+github = "https://github.com/jsuereth"
+bluesky = "https://bsky.app/profile/jsuereth.bsky.social"
+linkedin = "https://www.linkedin.com/in/joshuasuereth"

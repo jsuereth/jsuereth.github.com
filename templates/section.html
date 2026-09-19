@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}{{ section.title }} &bull; {{ config.title }}{% endblock title %}
+
+{% block content %}
+<div>
+  <h1>{{ section.title }}</h1>
+  {% if section.content %}
+    <div class="article-content" style="margin-bottom: 2rem;">
+      {{ section.content | safe }}
+    </div>
+  {% endif %}
+
+  <ul class="post-list">
+    {% for page in paginator.pages | default(value=section.pages) %}
+    <li class="post-item">
+      <div class="post-item-meta">
+        <time datetime="{{ page.date }}">{{ page.date | date(format="%B %d, %Y") }}</time>
+        {% if page.taxonomies.categories %}
+          &bull;
+          <a href="{{ get_taxonomy_url(kind='categories', name=page.taxonomies.categories[0]) }}" class="post-badge">{{ page.taxonomies.categories[0] }}</a>
+        {% endif %}
+        &bull;
+        <span>{{ page.reading_time }} min read</span>
+      </div>
+      <h2 class="post-item-title" style="border-bottom: none; margin: 0; padding: 0;">
+        <a href="{{ page.permalink }}">{{ page.title }}</a>
+      </h2>
+    </li>
+    {% endfor %}
+  </ul>
+
+  {% if paginator %}
+  <div class="pagination">
+    <div>
+      {% if paginator.previous %}
+        <a href="{{ paginator.previous }}">&larr; Newer Posts</a>
+      {% endif %}
+    </div>
+    <div style="color: var(--text-muted); font-size: 0.85rem;">
+      Page {{ paginator.current_index }} of {{ paginator.number_pagers }}
+    </div>
+    <div>
+      {% if paginator.next %}
+        <a href="{{ paginator.next }}">Older Posts &rarr;</a>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock content %}

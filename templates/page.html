@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} &bull; {{ config.title }}{% endblock title %}
+{% block description %}{{ page.summary | default(value=page.content | striptags | truncate(length=160)) }}{% endblock description %}
+
+{% block content %}
+<article class="article-container">
+  <div class="article-content">
+    {{ page.content | safe }}
+  </div>
+</article>
+{% endblock content %}

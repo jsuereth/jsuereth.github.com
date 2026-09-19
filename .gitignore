@@ -1,2 +1,5 @@
 _site
+public
 *~
+.DS_Store
+Thumbs.db

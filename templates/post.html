@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} &bull; {{ config.title }}{% endblock title %}
+{% block description %}{{ page.summary | default(value=page.content | striptags | truncate(length=160)) }}{% endblock description %}
+{% block og_title %}{{ page.title }}{% endblock og_title %}
+{% block og_desc %}{{ page.summary | default(value=page.content | striptags | truncate(length=160)) }}{% endblock og_desc %}
+
+{% block content %}
+<article class="article-container">
+  <header class="article-header">
+    <div class="article-meta">
+      <time datetime="{{ page.date }}">{{ page.date | date(format="%B %d, %Y") }}</time>
+      <span>&bull;</span>
+      <span>{{ page.reading_time }} min read</span>
+      {% if page.taxonomies.categories %}
+        <span>&bull;</span>
+        {% for cat in page.taxonomies.categories %}
+          <a href="{{ get_taxonomy_url(kind='categories', name=cat) }}" class="post-badge">{{ cat }}</a>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <h1 class="article-title">{{ page.title }}</h1>
+  </header>
+
+  {% if page.toc and page.toc | length > 2 %}
+  <div class="toc-box">
+    <div class="toc-title">Table of Contents</div>
+    <ul>
+      {% for h1 in page.toc %}
+        <li>
+          <a href="{{ h1.permalink | safe }}">{{ h1.title }}</a>
+          {% if h1.children %}
+            <ul>
+              {% for h2 in h1.children %}
+                <li><a href="{{ h2.permalink | safe }}">{{ h2.title }}</a></li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <div class="article-content">
+    {{ page.content | safe }}
+  </div>
+
+  <nav class="post-nav">
+    <div>
+      {% if page.lower %}
+        <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); display: block;">&larr; Older</span>
+        <a href="{{ page.lower.permalink }}">{{ page.lower.title }}</a>
+      {% endif %}
+    </div>
+    <div style="text-align: right;">
+      {% if page.higher %}
+        <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); display: block;">Newer &rarr;</span>
+        <a href="{{ page.higher.permalink }}">{{ page.higher.title }}</a>
+      {% endif %}
+    </div>
+  </nav>
+</article>
+{% endblock content %}

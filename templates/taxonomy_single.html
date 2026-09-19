@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}{{ term.name }} &bull; Categories &bull; {{ config.title }}{% endblock title %}
+
+{% block content %}
+<div>
+  <div style="display: flex; align-items: baseline; gap: 0.75rem; margin-bottom: 2rem;">
+    <h1 style="margin: 0;">Category: {{ term.name }}</h1>
+    <a href="/categories/" style="font-size: 0.88rem;">&larr; All Categories</a>
+  </div>
+
+  <ul class="post-list">
+    {% for page in term.pages %}
+    <li class="post-item">
+      <div class="post-item-meta">
+        <time datetime="{{ page.date }}">{{ page.date | date(format="%B %d, %Y") }}</time>
+        &bull;
+        <span>{{ page.reading_time }} min read</span>
+      </div>
+      <h2 class="post-item-title" style="border-bottom: none; margin: 0; padding: 0;">
+        <a href="{{ page.permalink }}">{{ page.title }}</a>
+      </h2>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock content %}

@@ -1,0 +1,24 @@
++++
+title = "Talks"
+slug = "talks"
++++
+
+# Conference Talks & Presentations
+
+A chronological record of keynotes, conference talks, and panel sessions on observability, build tools, compiler architectures, and language design.
+
+| Year | Presentation | Conference / Event | Links |
+| :--- | :--- | :--- | :--- |
+| **2025** | **Observability by Design: Leveraging OpenTelemetry Weaver**<br><span class="table-sub">with Laurent Querel (F5) &bull; Schema-driven telemetry, code generation, and CI/CD policy.</span> | KubeCon Europe 2025 / Observability Day EU | [Video (YouTube)](https://www.youtube.com/watch?v=kYJcZqG3E1c) &bull; [Schedule](https://colocatedeventsna2025.sched.com/event/1uoF2) |
+| **2025** | **OpenTelemetry: Unpacking 2025, Charting 2026**<br><span class="table-sub">with Alolita Sharma, Morgan McLean, Austin Parker &bull; Milestones across signals, governance, roadmap.</span> | KubeCon North America 2025 (Atlanta) | [Video (YouTube)](https://www.youtube.com/results?search_query=OpenTelemetry%3A+Unpacking+2025%2C+Charting+2026+KubeCon) &bull; [Schedule](https://kccncna2025.sched.com/event/1txxO) |
+| **2025** | **Behind the Proposals: How OpenTelemetry Designs Take Shape**<br><span class="table-sub">Panel on the OTEP lifecycle, multi-vendor consensus, and technical evolutions.</span> | KubeCon North America 2025 (Atlanta) | [Video (YouTube)](https://www.youtube.com/results?search_query=Behind+the+Proposals%3A+How+OpenTelemetry+Designs+Take+Shape+KubeCon) &bull; [Schedule](https://kccncna2025.sched.com/event/1ty2a) |
+| **2024** | **OpenTelemetry Technical Committee Panel**<br><span class="table-sub">with Reiley Yang, Rynn Mancuso, Jack Berg &bull; Open Q&amp;A on project priorities and technical direction.</span> | KubeCon North America 2024 (Salt Lake City) | [Video (YouTube)](https://www.youtube.com/watch?v=oi2g47_F6tA) &bull; [Schedule](https://kccncna2024.sched.com/event/1i7pU) |
+| **2021** | **Cloud-Native and Kubernetes Observability**<br><span class="table-sub">Panel on application instrumentation, infrastructure telemetry, and collector pipelines.</span> | KubeCon North America 2021 | [Schedule](https://kccncna2021.sched.com/) |
+| **2016** | **A Brief (Incomplete and Mostly Wrong) History of Build Tools**<br><span class="table-sub">with Eugene Yokota &bull; Decades of build evolution from Make to sbt, DAGs, and incremental compilers.</span> | Scala Days 2016 (New York &amp; Berlin) | [Video (YouTube)](https://www.youtube.com/watch?v=kYJcZqG3E1c) &bull; [Event](https://scaladays.org/) |
+| **2014** | **sbt 1.0 &mdash; The Interactive Build Tool**<br><span class="table-sub">Client-server architecture, Zinc compiler isolation, and reactive build event streaming.</span> | Northeast Scala Symposium (NE Scala 2014) | [Video (YouTube)](https://www.youtube.com/watch?v=e_04c5uLgYg) &bull; [Event](http://nescala.org/) |
+| **2013** | **Effective sbt**<br><span class="table-sub">Multi-project build scoping, task dependency graphs, and plugin architecture best practices.</span> | Scala Days 2013 (New York) | [Video (YouTube)](https://www.youtube.com/results?search_query=Effective+sbt+Josh+Suereth+Scala+Days) &bull; [Event](https://scaladays.org/) |
+| **2013** | **Introduction to Functional Programming**<br><span class="table-sub">Practical FP patterns, immutability, and algebraic data types in production systems.</span> | Pittsburgh TechFest 2013 | [Code (GitHub)](https://github.com/jsuereth/intro-to-fp) &bull; [Post](/posts/nescala-intro-to-fp-talk/) |
+| **2012** | **Keynote: Effective Scala**<br><span class="table-sub">Keynote address on language ergonomics, composition over inheritance, and implicit scope without tax.</span> | Northeast Scala Symposium (NE Scala 2012, Boston) | [Video (YouTube)](https://www.youtube.com/watch?v=oi2g47_F6tA) &bull; [Event](http://nescala.org/) |
+| **2012** | **The Evolution of Object-Oriented Programming**<br><span class="table-sub">with James Ward &bull; How FP idioms, traits, and typeclasses redefined modern object-oriented programming.</span> | Philly Emerging Technologies for the Enterprise (2012) | [Video &amp; Screencast](https://chariotsolutions.com/screencast/philly-ete-2012-james-ward-josh-suereth-the-evolution-of-object-oriented-programming/) |
+| **2012** | **Binary Resilience in Scala**<br><span class="table-sub">Understanding binary compatibility, ABI evolution on the JVM, and maintaining library resilience.</span> | Scala Days 2012 (London) | [Code (GitHub)](https://github.com/jsuereth/binary-resilience) &bull; [Event](https://scaladays.org/) |
+| **2011** | **Akka: Reloaded**<br><span class="table-sub">Distributed actors, supervision hierarchies, and fault-tolerant concurrency on the JVM.</span> | The Strange Loop 2011 (St. Louis) | [Video (InfoQ)](https://www.infoq.com/presentations/Akka-Reloaded/) &bull; [Event](https://thestrangeloop.com/) |
